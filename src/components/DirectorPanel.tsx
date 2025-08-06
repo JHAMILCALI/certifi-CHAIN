@@ -48,8 +48,11 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
         .toLowerCase()
         .replace(/\s+/g, "-")}.jpg`;
 
+      // Convert Blob to File
+      const file = new File([blob], fileName, { type: "image/jpeg" });
+
       const upload = await pinata.upload.public
-        .file(blob, {
+        .file(file, {
           metadata: {
             name: fileName,
           },

@@ -51,11 +51,22 @@ const AdminPanel = ({ modoOscuro }: AdminPanelProps) => {
       await tx.wait();
       setMensaje(`Director ${directorAddress} agregado exitosamente.`);
       setDirectorAddress("");
-    } catch (error: any) {
-      if (error.code === "ACTION_REJECTED") {
+    } catch (error: unknown) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        (error as { code?: string }).code === "ACTION_REJECTED"
+      ) {
         setMensaje("❌ Acción cancelada por el usuario.");
       } else {
-        setMensaje(`⚠️ Error: ${error.message || error}`);
+        setMensaje(
+          `⚠️ Error: ${
+            typeof error === "object" && error !== null && "message" in error
+              ? (error as { message?: string }).message
+              : String(error)
+          }`
+        );
       }
     } finally {
       setLoading(false);
