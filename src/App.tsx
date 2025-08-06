@@ -7,6 +7,7 @@ import DirectorPanel from './components/DirectorPanel';
 import StudentPanel from './components/StudentPanel';
 //import RoleSelector from './components/RoleSelector';
 
+
 // Tipos para los roles
 type UserRole = 'admin' | 'director' | 'student' | null;
 
