@@ -5,8 +5,8 @@ interface StudentPanelProps {
   modoOscuro: boolean;
 }
 
-const StudentPanel = ({ account, modoOscuro }: StudentPanelProps) => {
-  const [certificados, setCertificados] = useState<any[]>([]); // Aquí almacenarías los certificados del estudiante
+const StudentPanel = ({  modoOscuro }: StudentPanelProps) => {
+  const [certificados] = useState<any[]>([]); // Aquí almacenarías los certificados del estudiante
 
   return (
     <div>
