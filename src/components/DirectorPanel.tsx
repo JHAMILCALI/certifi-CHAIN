@@ -19,13 +19,13 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
   const [institucion, setInstitucion] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
   const [link, setLink] = useState("");
-  const [showJsonForm, setShowJsonForm] = useState(false); // 🔽 NUEVO
-  const [jsonData, setJsonData] = useState({
-    description: "",
-    name: "",
-    base: "",
-    content: ""
-  }); // 🔽 NUEVO
+  // const [showJsonForm, setShowJsonForm] = useState(false); // 🔽 NUEVO
+  // const [jsonData, setJsonData] = useState({
+  //   description: "",
+  //   name: "",
+  //   base: "",
+  //   content: ""
+  // }); // 🔽 NUEVO
 
   const certRef = useRef<HTMLDivElement>(null);
 
@@ -82,7 +82,7 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
         const ipfsLink = await pinata.gateways.public.convert(upload.cid);
         setLink(ipfsLink);
         setUploadStatus("✅ Certificado subido exitosamente.");
-        setShowJsonForm(true); // 🔽 Mostrar formulario para el JSON
+        //setShowJsonForm(true); // 🔽 Mostrar formulario para el JSON
       } else {
         setUploadStatus("❌ Falló la subida del archivo.");
       }
