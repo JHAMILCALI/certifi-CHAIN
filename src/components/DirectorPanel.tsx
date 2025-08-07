@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import { PinataSDK } from "pinata";
+import certificadoImg from '../assets/certificado.jpg'; 
 
 interface DirectorPanelProps {
   account: string;
@@ -190,7 +191,7 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
               style={{
                 width: "1386px",
                 height: "980px",
-                backgroundImage: `url('/src/assets/certificado.jpg')`, // Asegúrate que el archivo esté en public o correctamente referenciado
+                backgroundImage: `url(${certificadoImg})`, // Asegúrate que el archivo esté en public o correctamente referenciado
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
