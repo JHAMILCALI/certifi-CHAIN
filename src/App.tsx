@@ -5,8 +5,7 @@ import Web3Modal from 'web3modal';
 import AdminPanel from './components/AdminPanel';
 import DirectorPanel from './components/DirectorPanel';
 import StudentPanel from './components/StudentPanel';
-//import RoleSelector from './components/RoleSelector';
-
+import AnimatedBackground from './components/AnimatedBackground';
 
 // Tipos para los roles
 type UserRole = 'admin' | 'director' | 'student' | null;
@@ -19,40 +18,39 @@ const App = () => {
 
   // Simulación: Verificar rol basado en la dirección de la wallet
   const verificarRol = async (address: string, signer: any): Promise<UserRole> => {
-  try {
-    const contract = getContract(signer);
-    const role: string = await contract.checkRole(address);
-    if (role === "admin" || role === "director" || role === "student") {
-      return role as UserRole;
-    } else {
+    try {
+      const contract = getContract(signer);
+      const role: string = await contract.checkRole(address);
+      if (role === "admin" || role === "director" || role === "student") {
+        return role as UserRole;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error("Error verificando rol:", error);
       return null;
     }
-  } catch (error) {
-    console.error("Error verificando rol:", error);
-    return null;
-  }
-};
+  };
 
   const conectarBilletera = async () => {
-  setLoading(true);
-  try {
-    const web3Modal = new Web3Modal();
-    const conexion = await web3Modal.connect();
-    const proveedor = new ethers.BrowserProvider(conexion);
-    const firmante = await proveedor.getSigner();
-    const direccion = await firmante.getAddress();
+    setLoading(true);
+    try {
+      const web3Modal = new Web3Modal();
+      const conexion = await web3Modal.connect();
+      const proveedor = new ethers.BrowserProvider(conexion);
+      const firmante = await proveedor.getSigner();
+      const direccion = await firmante.getAddress();
 
-    const rol = await verificarRol(direccion, firmante); // ← ahora pasas el signer
+      const rol = await verificarRol(direccion, firmante);
 
-    setAccount(direccion);
-    setUserRole(rol);
-  } catch (error) {
-    console.error("Error conectando billetera:", error);
-  } finally {
-    setLoading(false);
-  }
-};
-
+      setAccount(direccion);
+      setUserRole(rol);
+    } catch (error) {
+      console.error("Error conectando billetera:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const alternarModo = () => {
     setModoOscuro(!modoOscuro);
@@ -73,9 +71,10 @@ const App = () => {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${modoOscuro ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen transition-colors duration-300 relative ${modoOscuro ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
+      <AnimatedBackground />
       {/* Encabezado común para todos los roles */}
-      <header className={`shadow-sm ${modoOscuro ? 'bg-gray-800' : 'bg-white'}`}>
+      <header className={`shadow-sm relative z-10 ${modoOscuro ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -99,7 +98,7 @@ const App = () => {
               </button>
 
               {/* Estado de conexión */}
-              {account ? (
+              {account && (
                 <div className="flex items-center space-x-3">
                   <span className={`text-sm ${modoOscuro ? 'text-gray-300' : 'text-gray-600'}`}>
                     {`${account.substring(0, 6)}...${account.substring(account.length - 4)}`}
@@ -107,18 +106,11 @@ const App = () => {
                   <button 
                     onClick={desconectar}
                     className={`px-3 py-1 rounded-lg text-sm ${modoOscuro ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-500 hover:bg-red-600 text-white'}`}
+                    disabled={loading}
                   >
                     Desconectar
                   </button>
                 </div>
-              ) : (
-                <button 
-                  onClick={conectarBilletera}
-                  disabled={loading}
-                  className={`px-4 py-2 rounded-lg transition ${modoOscuro ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'} ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  {loading ? 'Conectando...' : 'Conectar Wallet'}
-                </button>
               )}
             </div>
           </div>
@@ -126,21 +118,48 @@ const App = () => {
       </header>
 
       {/* Contenido principal basado en el rol */}
-      <main className="container mx-auto px-6 py-8">
+      <main className="flex flex-1 items-center justify-center min-h-[calc(100vh-80px)] relative z-10">
         {!account ? (
-          <div className="text-center max-w-2xl mx-auto">
-            <h1 className={`text-3xl md:text-4xl font-bold mb-6 ${modoOscuro ? 'text-white' : 'text-gray-800'}`}>
+          <div className={`text-center max-w-2xl mx-auto flex flex-col justify-center items-center w-full p-8 rounded-xl shadow-lg ${modoOscuro ? 'bg-gray-800' : 'bg-white'}`}>
+            <h2 className={`text-4xl md:text-5xl font-extrabold mb-6 ${modoOscuro ? 'text-white' : 'text-gray-800'}`}>
               Plataforma de Certificados NFT
-            </h1>
-            <p className={`text-xl mb-8 ${modoOscuro ? 'text-gray-300' : 'text-gray-600'}`}>
+            </h2>
+            <p className={`text-lg md:text-xl mb-8 ${modoOscuro ? 'text-gray-300' : 'text-gray-600'}`}>
               Conecta tu billetera para acceder al panel correspondiente según tu rol en la plataforma.
             </p>
             <button 
               onClick={conectarBilletera}
               disabled={loading}
-              className={`px-8 py-3 rounded-lg transition font-medium ${modoOscuro ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'} ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`px-8 py-3 rounded-lg font-semibold shadow transition-all duration-200 relative overflow-hidden
+                ${modoOscuro ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'}
+                ${loading ? 'opacity-50 cursor-not-allowed' : ''}
+                group
+              `}
+              style={{ zIndex: 1 }}
             >
-              {loading ? 'Conectando...' : 'Conectar Wallet'}
+              {/* Efecto RGB animado en el fondo al hacer hover */}
+              <span
+                className="absolute inset-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+                style={{
+                  background: 'linear-gradient(270deg, #ff0080, #7928ca, #00ffea, #ff0080)',
+                  backgroundSize: '600% 600%',
+                  animation: 'rgbGlow 2s linear infinite',
+                  filter: 'blur(12px)',
+                  zIndex: 0,
+                }}
+              />
+              <span className="relative z-10">
+                {loading ? 'Conectando...' : 'Conectar Wallet'}
+              </span>
+              <style>
+                {`
+                  @keyframes rgbGlow {
+                    0% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+                    100% { background-position: 0% 50%; }
+                  }
+                `}
+              </style>
             </button>
           </div>
         ) : userRole === 'admin' ? (
