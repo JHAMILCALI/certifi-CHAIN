@@ -41,6 +41,19 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
       const urlResponse = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/presigned_url`
       );
+
+      if (!urlResponse.ok) {
+        throw new Error(
+          `Error al obtener URL prefirmada: ${urlResponse.statusText}`
+        );
+      }
+
+      const contentType = urlResponse.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await urlResponse.text();
+        throw new Error(`Respuesta inesperada del servidor: ${text}`);
+      }
+
       const data = await urlResponse.json();
 
       setUploadStatus("⬆️ Subiendo certificado a IPFS...");
