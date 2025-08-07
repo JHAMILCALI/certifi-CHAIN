@@ -89,156 +89,161 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
   };
 
   return (
-    <div>
-      <h1
-        className={`text-3xl font-bold mb-6 ${
-          modoOscuro ? "text-white" : "text-gray-800"
-        }`}
-      >
-        Panel de Director/Administrativo
-      </h1>
-
-      <div
-        className={`flex border-b mb-6 ${
-          modoOscuro ? "border-gray-700" : "border-gray-200"
-        }`}
-      >
-        {["emitir", "verificar", "historial", "reportes"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 font-medium capitalize ${
-              modoOscuro ? "text-gray-300" : "text-gray-600"
-            } ${
-              activeTab === tab
-                ? modoOscuro
-                  ? "border-b-2 border-blue-500 text-white"
-                  : "border-b-2 border-blue-500 text-blue-600"
-                : ""
+    <div className={`min-h-screen ${modoOscuro ? "bg-gray-900" : "bg-gray-50"}`}>
+      {/* Contenedor principal con márgenes */}
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className={`p-6 rounded-lg ${modoOscuro ? "bg-gray-800" : "bg-white shadow"}`}>
+          <h1
+            className={`text-3xl font-bold mb-6 ${
+              modoOscuro ? "text-white" : "text-gray-800"
             }`}
           >
-            {tab}
-          </button>
-        ))}
-      </div>
+            Panel de Director/Administrativo
+          </h1>
 
-      <div
-        className={`p-6 rounded-lg ${
-          modoOscuro ? "bg-gray-800" : "bg-white shadow"
-        }`}
-      >
-        {activeTab === "emitir" && (
-          <>
-            <div className="flex flex-col md:flex-row gap-8">
-              {/* Columna izquierda - Formulario */}
-              <div className="w-full md:w-1/2">
-                <h2
-                  className={`text-xl font-semibold mb-4 ${
-                    modoOscuro ? "text-white" : "text-gray-800"
-                  }`}
-                >
-                  Emitir Nuevos Certificados
-                </h2>
-
-                <input
-                  type="text"
-                  placeholder="Nombre del estudiante"
-                  value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
-                  className="mb-4 block w-full p-2 border rounded"
-                />
-                <input
-                  type="text"
-                  placeholder="Institución"
-                  value={institucion}
-                  onChange={(e) => setInstitucion(e.target.value)}
-                  className="mb-4 block w-full p-2 border rounded"
-                />
-              </div>
-
-              {/* Columna derecha - Vista previa del certificado */}
-              <div className="w-full md:w-1/2 flex justify-center">
-                <div
-                  ref={certRef}
-                  style={{
-                    width: "500px",
-                    height: "350px",
-                    backgroundImage: `url(${certificadoImg})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    fontFamily: "serif",
-                    position: "relative",
-                    boxShadow: "0 0 15px rgba(0,0,0,0.2)",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <h1
-                    style={{
-                      fontSize: "50px",
-                      fontWeight: "bold",
-                      marginBottom: "30px",
-                      color: "#000",
-                    }}
-                  >
-                    {nombre}
-                  </h1>
-                  <h2
-                    style={{
-                      fontSize: "32px",
-                      marginBottom: "10px",
-                      color: "#000",
-                    }}
-                  >
-                    {institucion}
-                  </h2>
-                  <p style={{ fontSize: "24px", color: "#000" }}>
-                    Fecha: {new Date().toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Fila separada para el botón centrado */}
-            <div className="mt-6 flex justify-center">
+          <div
+            className={`flex border-b mb-6 ${
+              modoOscuro ? "border-gray-700" : "border-gray-200"
+            }`}
+          >
+            {["emitir", "verificar", "historial", "reportes"].map((tab) => (
               <button
-                onClick={handleUpload}
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Generar y Subir Certificado
-              </button>
-            </div>
-
-            {uploadStatus && (
-              <div
-                className={`mt-4 p-2 rounded text-center ${
-                  modoOscuro
-                    ? "bg-gray-700 text-green-300"
-                    : "bg-gray-100 text-green-700"
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 font-medium capitalize ${
+                  modoOscuro ? "text-gray-300" : "text-gray-600"
+                } ${
+                  activeTab === tab
+                    ? modoOscuro
+                      ? "border-b-2 border-blue-500 text-white"
+                      : "border-b-2 border-blue-500 text-blue-600"
+                    : ""
                 }`}
               >
-                {uploadStatus}
-              </div>
-            )}
+                {tab}
+              </button>
+            ))}
+          </div>
 
-            {link && (
-              <div className="mt-4 text-center">
-                <a
-                  href={link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline text-blue-400"
-                >
-                  Ver Certificado IPFS
-                </a>
-              </div>
+          <div
+            className={`p-6 rounded-lg ${
+              modoOscuro ? "bg-gray-800" : "bg-white shadow"
+            }`}
+          >
+            {activeTab === "emitir" && (
+              <>
+                <div className="flex flex-col md:flex-row gap-8">
+                  {/* Columna izquierda - Formulario */}
+                  <div className="w-full md:w-1/2">
+                    <h2
+                      className={`text-xl font-semibold mb-4 ${
+                        modoOscuro ? "text-white" : "text-gray-800"
+                      }`}
+                    >
+                      Emitir Nuevos Certificados
+                    </h2>
+
+                    <input
+                      type="text"
+                      placeholder="Nombre del estudiante"
+                      value={nombre}
+                      onChange={(e) => setNombre(e.target.value)}
+                      className="mb-4 block w-full p-2 border rounded"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Institución"
+                      value={institucion}
+                      onChange={(e) => setInstitucion(e.target.value)}
+                      className="mb-4 block w-full p-2 border rounded"
+                    />
+                  </div>
+
+                  {/* Columna derecha - Vista previa del certificado */}
+                  <div className="w-full md:w-1/2 flex justify-center">
+                    <div
+                      ref={certRef}
+                      style={{
+                        width: "800px",
+                        height: "450px",
+                        backgroundImage: `url(${certificadoImg})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        backgroundRepeat: "no-repeat",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        fontFamily: "serif",
+                        position: "relative",
+                        boxShadow: "0 0 15px rgba(0,0,0,0.2)",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      <h1
+                        style={{
+                          fontSize: "50px",
+                          fontWeight: "bold",
+                          marginBottom: "30px",
+                          color: "#000",
+                        }}
+                      >
+                        {nombre}
+                      </h1>
+                      <h2
+                        style={{
+                          fontSize: "32px",
+                          marginBottom: "10px",
+                          color: "#000",
+                        }}
+                      >
+                        {institucion}
+                      </h2>
+                      <p style={{ fontSize: "24px", color: "#000" }}>
+                        Fecha: {new Date().toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Fila separada para el botón centrado */}
+                <div className="mt-6 flex justify-center">
+                  <button
+                    onClick={handleUpload}
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                  >
+                    Generar y Subir Certificado
+                  </button>
+                </div>
+
+                {uploadStatus && (
+                  <div
+                    className={`mt-4 p-2 rounded text-center ${
+                      modoOscuro
+                        ? "bg-gray-700 text-green-300"
+                        : "bg-gray-100 text-green-700"
+                    }`}
+                  >
+                    {uploadStatus}
+                  </div>
+                )}
+
+                {link && (
+                  <div className="mt-4 text-center">
+                    <a
+                      href={link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline text-blue-400"
+                    >
+                      Ver Certificado IPFS
+                    </a>
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );
