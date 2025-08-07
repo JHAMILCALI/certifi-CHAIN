@@ -76,6 +76,11 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
       if (upload.cid) {
         const ipfsLink = await pinata.gateways.public.convert(upload.cid);
         setLink(ipfsLink);
+        console.log("IPFS setLink:", setLink);
+        console.log("IPFS CID:", upload.cid);
+        console.log("IPFS URL:", ipfsLink);
+        console.log("IPFS upload:", upload);
+        console.log("IPFS link", link);
         setUploadStatus("✅ Certificado subido exitosamente.");
       } else {
         setUploadStatus("❌ Falló la subida del archivo.");
