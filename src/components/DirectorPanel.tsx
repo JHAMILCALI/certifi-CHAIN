@@ -94,46 +94,46 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
     }
   };
   // parte del json
-  const handleJsonUpload = async () => {
-  const metadata = {
-    description: jsonData.description,
-    external_url: "https://wirawallet.com",
-    image: link,
-    name: jsonData.name,
-    attributes: [
-      { trait_type: "Base", value: jsonData.base },
-      { trait_type: "Content", value: jsonData.content }
-    ]
-  };
+//   const handleJsonUpload = async () => {
+//   const metadata = {
+//     description: jsonData.description,
+//     external_url: "https://wirawallet.com",
+//     image: link,
+//     name: jsonData.name,
+//     attributes: [
+//       { trait_type: "Base", value: jsonData.base },
+//       { trait_type: "Content", value: jsonData.content }
+//     ]
+//   };
 
-  try {
-    setUploadStatus("📦 Subiendo metadata JSON...");
+//   try {
+//     setUploadStatus("📦 Subiendo metadata JSON...");
 
-    const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/pinata/json`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(metadata),
-    });
+//     const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/pinata/json`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify(metadata),
+//     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status} - ${response.statusText}`);
-    }
+//     if (!response.ok) {
+//       throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+//     }
 
-    const result = await response.json();
-    const cid = result?.cid;
-    if (cid) {
-      const ipfsJsonLink = `${import.meta.env.VITE_GATEWAY_URL}/ipfs/${cid}`;
-      setUploadStatus(`✅ JSON subido exitosamente. [Ver JSON](${ipfsJsonLink})`);
-    } else {
-      throw new Error("No se recibió el CID");
-    }
-  } catch (error: any) {
-    console.error("Error al subir JSON:", error);
-    setUploadStatus("❌ Error al subir JSON: " + (error?.message || "ver consola"));
-  }
-};
+//     const result = await response.json();
+//     const cid = result?.cid;
+//     if (cid) {
+//       const ipfsJsonLink = `${import.meta.env.VITE_GATEWAY_URL}/ipfs/${cid}`;
+//       setUploadStatus(`✅ JSON subido exitosamente. [Ver JSON](${ipfsJsonLink})`);
+//     } else {
+//       throw new Error("No se recibió el CID");
+//     }
+//   } catch (error: any) {
+//     console.error("Error al subir JSON:", error);
+//     setUploadStatus("❌ Error al subir JSON: " + (error?.message || "ver consola"));
+//   }
+// };
 
 
 
