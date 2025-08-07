@@ -206,13 +206,33 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
                   </div>
                 </div>
 
-                {/* Fila separada para el botón centrado */}
+                {/* Fila separada para el botón centrado con efecto RGB */}
                 <div className="mt-6 flex justify-center">
                   <button
                     onClick={handleUpload}
-                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                    className="px-6 py-3 rounded-lg font-semibold shadow transition-all duration-200 relative overflow-hidden group"
+                    style={{ zIndex: 1 }}
                   >
-                    Generar y Subir Certificado
+                    {/* Fondo RGB animado (solo visible en hover) */}
+                    <span
+                      className="absolute inset-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+                      style={{
+                        background: 'linear-gradient(270deg, #ff0080, #7928ca, #00ffea, #ff0080)',
+                        backgroundSize: '600% 600%',
+                        animation: 'rgbGlow 2s linear infinite',
+                        filter: 'blur(12px)',
+                        zIndex: 0,
+                      }}
+                    />
+                    {/* Capa base del botón */}
+                    <span 
+                      className={`absolute inset-0 ${modoOscuro ? 'bg-blue-600' : 'bg-blue-500'} rounded-lg`}
+                      style={{ zIndex: -1 }}
+                    />
+                    {/* Texto del botón */}
+                    <span className="relative z-10 text-white">
+                      Generar y Subir Certificado
+                    </span>
                   </button>
                 </div>
 
@@ -240,6 +260,17 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
                     </a>
                   </div>
                 )}
+
+                {/* Estilos para la animación RGB */}
+                <style>
+                  {`
+                    @keyframes rgbGlow {
+                      0% { background-position: 0% 50%; }
+                      50% { background-position: 100% 50%; }
+                      100% { background-position: 0% 50%; }
+                    }
+                  `}
+                </style>
               </>
             )}
           </div>
