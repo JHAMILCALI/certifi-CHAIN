@@ -19,6 +19,7 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
   const [uploadStatus, setUploadStatus] = useState("");
   const [link, setLink] = useState("");
   const certRef = useRef<HTMLDivElement>(null);
+  const [mostrarCertificado, setMostrarCertificado] = useState(false);
 
   const handleUpload = async () => {
     if (!nombre || !institucion) {
@@ -26,8 +27,12 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
       return;
     }
 
+    setMostrarCertificado(true); // Mostrar certificado antes de capturarlo
+
     try {
       setUploadStatus("🖼️ Generando imagen...");
+      await new Promise((r) => setTimeout(r, 100)); // Espera breve para renderizar
+
       const canvas = await html2canvas(certRef.current!, {
         useCORS: true,
         scale: 2,
@@ -41,6 +46,10 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
       const urlResponse = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/presigned_url`
       );
+      if (!urlResponse.ok) {
+        const errorText = await urlResponse.text();
+        throw new Error(`Error al obtener URL prefirmada: ${urlResponse.status} - ${errorText}`);
+      }
       const data = await urlResponse.json();
 
       setUploadStatus("⬆️ Subiendo certificado a IPFS...");
@@ -170,51 +179,52 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
               </div>
             )}
 
-            {/* Vista previa del certificado (invisible pero usada por html2canvas) */}
-            {/* Vista previa del certificado (visible en pantalla) */}
-            <div
-              ref={certRef}
-              style={{
-                width: "1386px",
-                height: "980px",
-                backgroundImage: `url('/src/assets/certificado.jpg')`, // Asegúrate que el archivo esté en public o correctamente referenciado
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                fontFamily: "serif",
-                position: "relative",
-                margin: "0 auto", // Centrado
-                boxShadow: "0 0 15px rgba(0,0,0,0.2)",
-                borderRadius: "8px",
-              }}
-            >
-              <h1
+            {/* Vista previa del certificado (solo si mostrarCertificado es true) */}
+            {mostrarCertificado && (
+              <div
+                ref={certRef}
                 style={{
-                  fontSize: "50px",
-                  fontWeight: "bold",
-                  marginBottom: "30px",
-                  color: "#000",
+                  width: "500px",
+                  height: "350px",
+                  backgroundImage: `url('/src/assets/certificado.jpg')`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  fontFamily: "serif",
+                  position: "relative",
+                  margin: "0 auto",
+                  boxShadow: "0 0 15px rgba(0,0,0,0.2)",
+                  borderRadius: "8px",
                 }}
               >
-                {nombre}
-              </h1>
-              <h2
-                style={{
-                  fontSize: "32px",
-                  marginBottom: "10px",
-                  color: "#000",
-                }}
-              >
-                {institucion}
-              </h2>
-              <p style={{ fontSize: "24px", color: "#000" }}>
-                Fecha: {new Date().toLocaleDateString()}
-              </p>
-            </div>
+                <h1
+                  style={{
+                    fontSize: "50px",
+                    fontWeight: "bold",
+                    marginBottom: "30px",
+                    color: "#000",
+                  }}
+                >
+                  {nombre}
+                </h1>
+                <h2
+                  style={{
+                    fontSize: "32px",
+                    marginBottom: "10px",
+                    color: "#000",
+                  }}
+                >
+                  {institucion}
+                </h2>
+                <p style={{ fontSize: "24px", color: "#000" }}>
+                  Fecha: {new Date().toLocaleDateString()}
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
