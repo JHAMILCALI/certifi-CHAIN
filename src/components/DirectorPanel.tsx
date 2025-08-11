@@ -1,11 +1,14 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import html2canvas from "html2canvas";
 import { PinataSDK } from "pinata";
-import certificadoImg from '../assets/certificado.jpg'; 
+import certificadoImg from "../assets/certificado.jpg";
+import { ethers } from "ethers";
+import { getCertiChainTokenContract } from "../contracts/CertiChainToken";
 
 interface DirectorPanelProps {
   account: string;
   modoOscuro: boolean;
+  signer?: ethers.Signer;  // Añadido signer como prop opcional
 }
 
 const pinata = new PinataSDK({
@@ -13,21 +16,65 @@ const pinata = new PinataSDK({
   pinataGateway: import.meta.env.VITE_GATEWAY_URL,
 });
 
-const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
+const DirectorPanel = ({ modoOscuro, signer }: DirectorPanelProps) => {
   const [activeTab, setActiveTab] = useState("emitir");
   const [nombre, setNombre] = useState("");
   const [institucion, setInstitucion] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
   const [link, setLink] = useState("");
   const [showJsonForm, setShowJsonForm] = useState(false);
+  const [walletToMint, setWalletToMint] = useState("");
+  const [showMintForm, setShowMintForm] = useState(false);
+  const [mintStatus] = useState("");
+  const [jsonLink, setJsonLink] = useState("");
+  const [mintPrice, setMintPrice] = useState("0");
+  const [isLoadingPrice, setIsLoadingPrice] = useState(false);
+  //const [isMinting, setIsMinting] = useState(false); // Nuevo estado para controlar minting
+
   const [jsonData, setJsonData] = useState({
     description: "",
     name: "",
     base: "",
-    content: ""
+    content: "",
   });
 
   const certRef = useRef<HTMLDivElement>(null);
+
+  // Función para obtener el precio actual del mint
+  const getMintPrice = async () => {
+    try {
+      setIsLoadingPrice(true);
+      
+      // Usar el signer pasado como prop o crear uno nuevo
+      let providerOrSigner;
+      if (signer) {
+        providerOrSigner = signer;
+      } else {
+        // ts-ignore
+        if (!window.ethereum) {
+          throw new Error("MetaMask no está instalado");
+        }
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        providerOrSigner = provider;
+      }
+      
+      const contract = getCertiChainTokenContract(providerOrSigner);
+      const price = await contract.mintPrice();
+      const priceInEth = ethers.utils.formatEther(price);
+      setMintPrice(priceInEth);
+    } catch (error) {
+      console.error("Error obteniendo precio:", error);
+      setMintPrice("0.001"); // Precio por defecto
+    } finally {
+      setIsLoadingPrice(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showMintForm) {
+      getMintPrice();
+    }
+  }, [showMintForm]);
 
   // SUBIR IMAGEN
   const handleUpload = async () => {
@@ -83,7 +130,7 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
         const ipfsLink = await pinata.gateways.public.convert(upload.cid);
         setLink(ipfsLink);
         setUploadStatus("✅ Certificado subido exitosamente.");
-        setShowJsonForm(true); // Mostrar formulario JSON
+        setShowJsonForm(true);
       } else {
         setUploadStatus("❌ Falló la subida del archivo.");
       }
@@ -97,44 +144,100 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
 
   // SUBIR JSON
   const handleJsonUpload = async () => {
-  const metadata = {
-    description: jsonData.description,
-    external_url: "https://wirawallet.com",
-    image: link,  // URL de la imagen ya subida
-    name: jsonData.name,
-    attributes: [
-      { trait_type: "Base", value: jsonData.base },
-      { trait_type: "Content", value: jsonData.content }
-    ]
-  }
+    const metadata = {
+      description: jsonData.description,
+      external_url: "https://wirawallet.com",
+      image: link,
+      name: jsonData.name,
+      attributes: [
+        { trait_type: "Base", value: jsonData.base },
+        { trait_type: "Content", value: jsonData.content },
+      ],
+    };
 
+    try {
+      setUploadStatus("📦 Subiendo metadata JSON...");
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/pinata/json`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(metadata),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      const cid = result?.cid;
+      if (cid) {
+        const ipfsJsonLink = `https://${import.meta.env.VITE_GATEWAY_URL}/ipfs/${cid}`;
+        setUploadStatus(`✅ JSON subido exitosamente. Ver JSON: ${ipfsJsonLink}`);
+        setJsonLink(ipfsJsonLink);
+        setShowMintForm(true);
+      } else {
+        throw new Error("No se recibió el CID");
+      }
+    } catch (error: any) {
+      console.error("Error al subir JSON:", error);
+      setUploadStatus(
+        "❌ Error al subir JSON: " + (error?.message || "ver consola")
+      );
+    }
+  };
+
+  // MINTEAR NFT
+  async function mintNFT(ipfsJsonLink: string) {
   try {
-    setUploadStatus("📦 Subiendo metadata JSON...")
+    console.log("🔄 Conectando a contrato...");
 
-    const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/pinata/json`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(metadata)
-    })
+    // Conectar con MetaMask si no está conectado
+    if (!(window as any).ethereum) {
+      throw new Error("MetaMask no está instalado.");
+    }
+    await (window as any).ethereum.request({ method: "eth_requestAccounts" });
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status} - ${response.statusText}`)
+    // Provider y signer
+    const provider = new ethers.BrowserProvider((window as any).ethereum);
+    const signer = await provider.getSigner();
+
+    // Instanciar contrato
+    const contract = getCertiChainTokenContract(signer);
+
+    // ✅ Verificar función
+    if (typeof contract.mintPrice !== "function") {
+      throw new Error("La función mintPrice no existe en el contrato. Revisa el ABI.");
     }
 
-    const result = await response.json()
-    const cid = result?.cid
-    if (cid) {
-      const ipfsJsonLink = `https://${import.meta.env.VITE_GATEWAY_URL}/ipfs/${cid}`
-      setUploadStatus(`✅ JSON subido exitosamente. Ver JSON: ${ipfsJsonLink}`)
-      console.log("JSON subido a IPFS:", ipfsJsonLink)
-    } else {
-      throw new Error("No se recibió el CID")
+    // Obtener precio
+    const currentPrice = await contract.mintPrice();
+    console.log("💰 Precio en wei:", currentPrice.toString());
+
+    // Aquí usamos formatEther de la versión nueva de ethers
+    console.log("💰 Precio en ETH:", ethers.formatEther(currentPrice));
+    //verifacamos wallet
+    if (!ethers.isAddress(walletToMint)) {
+      alert("Dirección de wallet inválida");
+      return;
     }
+    console.log("✅ Dirección de wallet válida:", walletToMint);
+    // Ejecutar mint
+    console.log("🚀 Ejecutando mint...");
+    const tx = await contract.safeMint(walletToMint, ipfsJsonLink, { value: currentPrice });
+
+    
+
+    console.log("⏳ Esperando confirmación...");
+    const receipt = await tx.wait();
+    console.log("✅ NFT minteado:", receipt);
+
   } catch (error: any) {
-    console.error("Error al subir JSON:", error)
-    setUploadStatus("❌ Error al subir JSON: " + (error?.message || "ver consola"))
+    console.error("❌ Error en mintNFT:", error.message || error);
   }
 }
 
@@ -236,15 +339,13 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
                     <span
                       className="absolute inset-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
                       style={{
-                        background: 'linear-gradient(270deg, #ff0080, #7928ca, #00ffea, #ff0080)',
-                        backgroundSize: '600% 600%',
-                        animation: 'rgbGlow 2s linear infinite',
-                        filter: 'blur(12px)',
+                        background: "linear-gradient(270deg, #ff0080, #7928ca, #00ffea, #ff0080)",
+                        backgroundSize: "600% 600%",
+                        animation: "rgbGlow 2s linear infinite",
+                        filter: "blur(12px)",
                       }}
                     />
-                    <span 
-                      className={`absolute inset-0 ${modoOscuro ? 'bg-blue-600' : 'bg-blue-500'} rounded-lg`}
-                    />
+                    <span className={`absolute inset-0 ${modoOscuro ? "bg-blue-600" : "bg-blue-500"} rounded-lg`} />
                     <span className="relative z-10 text-white">
                       Generar y Subir Certificado
                     </span>
@@ -259,35 +360,35 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
                     </h3>
                     <input
                       type="text"
-                      placeholder="Descripción"
+                      placeholder="Descripción del certificado"
                       value={jsonData.description}
                       onChange={(e) => setJsonData({ ...jsonData, description: e.target.value })}
                       className="mb-2 block w-full p-2 border rounded"
                     />
                     <input
                       type="text"
-                      placeholder="Nombre"
+                      placeholder="Nombre del certificado"
                       value={jsonData.name}
                       onChange={(e) => setJsonData({ ...jsonData, name: e.target.value })}
                       className="mb-2 block w-full p-2 border rounded"
                     />
                     <input
                       type="text"
-                      placeholder="Base"
+                      placeholder="Base/Curso"
                       value={jsonData.base}
                       onChange={(e) => setJsonData({ ...jsonData, base: e.target.value })}
                       className="mb-2 block w-full p-2 border rounded"
                     />
                     <input
                       type="text"
-                      placeholder="Contenido"
+                      placeholder="Contenido/Especialidad"
                       value={jsonData.content}
                       onChange={(e) => setJsonData({ ...jsonData, content: e.target.value })}
                       className="mb-4 block w-full p-2 border rounded"
                     />
                     <button
                       onClick={handleJsonUpload}
-                      className="px-6 py-2 rounded-lg bg-green-500 text-white font-semibold"
+                      className="px-6 py-2 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600 transition-colors"
                     >
                       Subir JSON a IPFS
                     </button>
@@ -295,8 +396,12 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
                 )}
 
                 {uploadStatus && (
-                  <div className={`mt-4 p-2 rounded text-center ${
-                    modoOscuro ? "bg-gray-700 text-green-300" : "bg-gray-100 text-green-700"
+                  <div className={`mt-4 p-3 rounded text-center ${
+                    uploadStatus.includes("✅")
+                      ? modoOscuro ? "bg-green-800 text-green-200" : "bg-green-100 text-green-700"
+                      : uploadStatus.includes("❌")
+                      ? modoOscuro ? "bg-red-800 text-red-200" : "bg-red-100 text-red-700"
+                      : modoOscuro ? "bg-blue-800 text-blue-200" : "bg-blue-100 text-blue-700"
                   }`}>
                     {uploadStatus}
                   </div>
@@ -304,9 +409,131 @@ const DirectorPanel = ({ modoOscuro }: DirectorPanelProps) => {
 
                 {link && (
                   <div className="mt-4 text-center">
-                    <a href={link} target="_blank" rel="noopener noreferrer" className="underline text-blue-400">
-                      Ver Certificado IPFS
+                    <a
+                      href={link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline text-blue-400 hover:text-blue-300"
+                    >
+                      🔗 Ver Certificado en IPFS
                     </a>
+                  </div>
+                )}
+
+                {/* FORMULARIO DE MINT */}
+                {showMintForm && (
+                  <div className="mt-8">
+                    <h3 className={`text-lg font-semibold mb-4 ${modoOscuro ? "text-white" : "text-gray-800"}`}>
+                      🎯 Mint NFT Certificate - Cualquier persona puede mintear
+                    </h3>
+                    
+                    <div className={`mb-4 p-4 rounded-lg ${modoOscuro ? "bg-blue-900 border border-blue-700" : "bg-blue-50 border border-blue-200"}`}>
+                      <div className="flex items-center justify-between">
+                        <span className={`font-medium ${modoOscuro ? "text-blue-200" : "text-blue-800"}`}>
+                          💰 Costo del certificado NFT:
+                        </span>
+                        <span className={`font-bold text-xl ${modoOscuro ? "text-blue-100" : "text-blue-900"}`}>
+                          {isLoadingPrice ? "⏳ Cargando..." : `${mintPrice} ETH`}
+                        </span>
+                      </div>
+                      <p className={`text-sm mt-2 ${modoOscuro ? "text-blue-300" : "text-blue-600"}`}>
+                        🌍 Cualquier persona con MetaMask puede pagar y mintear este certificado
+                      </p>
+                    </div>
+
+                    <div className="mb-4">
+                      <span className={`text-sm ${modoOscuro ? "text-gray-400" : "text-gray-600"}`}>
+                        📋 JSON Metadata IPFS:
+                      </span>
+                      <a
+                        href={jsonLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block underline text-blue-400 break-all hover:text-blue-300"
+                      >
+                        {jsonLink}
+                      </a>
+                    </div>
+
+                    <input
+                      type="text"
+                      placeholder="Dirección wallet destinataria (0x...)"
+                      value={walletToMint}
+                      onChange={(e) => setWalletToMint(e.target.value)}
+                      className={`mb-4 block w-full p-3 border rounded-lg ${
+                        modoOscuro 
+                          ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" 
+                          : "bg-white border-gray-300 text-gray-900"
+                      }`}
+                    />
+
+                    {/* <button
+                      onClick={mintNFT}
+                      disabled={!walletToMint || !jsonLink || isLoadingPrice || isMinting}
+                      className="w-full px-6 py-3 rounded-lg font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 relative overflow-hidden group"
+                    >
+                      <span
+                        className="absolute inset-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+                        style={{
+                          background: "linear-gradient(270deg, #00d4aa, #00a8ff, #0078ff, #00d4aa)",
+                          backgroundSize: "600% 600%",
+                          animation: "rgbGlow 2s linear infinite",
+                          filter: "blur(8px)",
+                        }}
+                      />
+                      <span
+                        className={`absolute inset-0 ${
+                          !walletToMint || !jsonLink || isLoadingPrice || isMinting
+                            ? "bg-gray-400"
+                            : "bg-green-600 hover:bg-green-700"
+                        } rounded-lg`}
+                      />
+                      <span className="relative z-10 text-white">
+                        {isLoadingPrice 
+                          ? "⏳ Cargando precio..." 
+                          : isMinting
+                          ? "⏳ Minteando..."
+                          : `💎 Mint Certificate NFT (${mintPrice} ETH)`
+                        }
+                      </span>
+                    </button> */}
+                    <button
+  onClick={() => mintNFT(jsonLink)}
+  className="bg-blue-600 text-white px-4 py-2 rounded"
+>
+  Mint NFT
+</button>
+
+
+                    {mintStatus && (
+                      <div
+                        className={`mt-4 p-4 rounded-lg whitespace-pre-line ${
+                          mintStatus.includes("✅")
+                            ? modoOscuro 
+                              ? "bg-green-800 text-green-100 border border-green-600" 
+                              : "bg-green-100 text-green-800 border border-green-300"
+                            : modoOscuro 
+                              ? "bg-red-800 text-red-100 border border-red-600" 
+                              : "bg-red-100 text-red-800 border border-red-300"
+                        }`}
+                      >
+                        {mintStatus}
+                      </div>
+                    )}
+
+                    <div className="mt-4 text-center">
+                      <button
+                        onClick={getMintPrice}
+                        disabled={isLoadingPrice}
+                        className={`text-sm px-4 py-2 rounded ${
+                          modoOscuro 
+                            ? "bg-gray-700 text-gray-300 hover:bg-gray-600" 
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        } disabled:opacity-50`}
+                      >
+                        {isLoadingPrice ? "⏳ Actualizando..." : "🔄 Actualizar precio"}
+                      </button>
+                    </div>
                   </div>
                 )}
 
