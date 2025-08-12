@@ -45,26 +45,25 @@ const DirectorPanel = ({ modoOscuro, signer }: DirectorPanelProps) => {
     try {
       setIsLoadingPrice(true);
       
-      // Usar el signer pasado como prop o crear uno nuevo
       let providerOrSigner;
       if (signer) {
         providerOrSigner = signer;
       } else {
-        // ts-ignore
-        if (!window.ethereum) {
+        if (!(window as any).ethereum) {
           throw new Error("MetaMask no está instalado");
         }
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        // Cambia esto:
+        const provider = new ethers.BrowserProvider((window as any).ethereum);
         providerOrSigner = provider;
       }
       
       const contract = getCertiChainTokenContract(providerOrSigner);
       const price = await contract.mintPrice();
-      const priceInEth = ethers.utils.formatEther(price);
+      const priceInEth = ethers.formatEther(price); // Cambia utils.formatEther por formatEther
       setMintPrice(priceInEth);
     } catch (error) {
       console.error("Error obteniendo precio:", error);
-      setMintPrice("0.001"); // Precio por defecto
+      setMintPrice("0.001");
     } finally {
       setIsLoadingPrice(false);
     }
@@ -221,7 +220,7 @@ const DirectorPanel = ({ modoOscuro, signer }: DirectorPanelProps) => {
     // Aquí usamos formatEther de la versión nueva de ethers
     console.log("💰 Precio en ETH:", ethers.formatEther(currentPrice));
     //verifacamos wallet
-    if (!ethers.isAddress(walletToMint)) {
+    if (!ethers.isAddress(walletToMint)) {  // Cambia utils.isAddress por isAddress
       alert("Dirección de wallet inválida");
       return;
     }
