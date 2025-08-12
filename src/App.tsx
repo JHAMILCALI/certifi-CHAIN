@@ -72,26 +72,44 @@ const App = () => {
     setSigner(null); // Limpiar el signer al desconectar
   };
 
-  // Agregar useEffect para el widget de CodeGPT
+  // Modificar el useEffect del widget para que se active/desactive según el estado de la cuenta
   useEffect(() => {
-    const script = document.createElement('script');
-    script.id = 'codeGPTWidgetScript';
-    script.type = 'module';
-    script.async = true;
-    script.defer = true;
-    script.src = 'https://widget.codegpt.co/chat-widget.js';
-    script.setAttribute('data-widget-id', '4dcf2feb-cd3d-4334-aae9-cc0f2e928926');
-    
-    document.body.appendChild(script);
+    const removeExistingScript = () => {
+      const existingScript = document.getElementById('codeGPTWidgetScript');
+      if (existingScript && existingScript.parentNode) {
+        existingScript.parentNode.removeChild(existingScript);
+        // También remover el widget si existe
+        const widgetFrame = document.querySelector('iframe[title="CodeGPT"]');
+        if (widgetFrame && widgetFrame.parentNode) {
+          widgetFrame.parentNode.removeChild(widgetFrame);
+        }
+      }
+    };
+
+    if (!account) {
+      // Primero remover cualquier instancia existente
+      removeExistingScript();
+      
+      // Luego agregar el nuevo script
+      const script = document.createElement('script');
+      script.id = 'codeGPTWidgetScript';
+      script.type = 'module';
+      script.async = true;
+      script.defer = true;
+      script.src = 'https://widget.codegpt.co/chat-widget.js';
+      script.setAttribute('data-widget-id', '4dcf2feb-cd3d-4334-aae9-cc0f2e928926');
+      
+      document.body.appendChild(script);
+    } else {
+      // Si hay cuenta conectada, remover todo
+      removeExistingScript();
+    }
 
     // Limpieza cuando el componente se desmonte
     return () => {
-      const existingScript = document.getElementById('codeGPTWidgetScript');
-      if (existingScript) {
-        document.body.removeChild(existingScript);
-      }
+      removeExistingScript();
     };
-  }, []); // Se ejecuta solo una vez al montar el componente
+  }, [account]); // Dependencia del estado de account
 
   return (
     <div className={`min-h-screen transition-colors duration-300 relative ${modoOscuro ? 'dark bg-gray-900' : 'bg-gray-50'}`}>

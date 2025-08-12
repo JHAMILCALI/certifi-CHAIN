@@ -4,6 +4,7 @@ import { PinataSDK } from "pinata";
 import certificadoImg from "../assets/certificado.jpg";
 import { ethers } from "ethers";
 import { getCertiChainTokenContract } from "../contracts/CertiChainToken";
+import { createClient } from '@supabase/supabase-js';
 
 interface DirectorPanelProps {
   account: string;
@@ -11,12 +12,18 @@ interface DirectorPanelProps {
   signer?: ethers.Signer;  // Añadido signer como prop opcional
 }
 
+// Configuración de Supabase
+const supabase = createClient(
+  'https://llemzfnbfdxwxqhpfhzv.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsZW16Zm5iZmR4d3hxaHBmaHp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwMTI5NzMsImV4cCI6MjA3MDU4ODk3M30.TLDKGeJcDtGSLMITfABeFLucNoApEYuRYzgz9lhbziE'
+);
+
 const pinata = new PinataSDK({
   pinataJwt: import.meta.env.VITE_PINATA_JWT,
   pinataGateway: import.meta.env.VITE_GATEWAY_URL,
 });
 
-const DirectorPanel = ({ modoOscuro, signer }: DirectorPanelProps) => {
+const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
   const [activeTab, setActiveTab] = useState("emitir");
   const [nombre, setNombre] = useState("");
   const [institucion, setInstitucion] = useState("");
@@ -25,11 +32,14 @@ const DirectorPanel = ({ modoOscuro, signer }: DirectorPanelProps) => {
   const [showJsonForm, setShowJsonForm] = useState(false);
   const [walletToMint, setWalletToMint] = useState("");
   const [showMintForm, setShowMintForm] = useState(false);
-  const [mintStatus] = useState("");
+  const [mintStatus, setMintStatus] = useState("");
   const [jsonLink, setJsonLink] = useState("");
   const [mintPrice, setMintPrice] = useState("0");
   const [isLoadingPrice, setIsLoadingPrice] = useState(false);
-  //const [isMinting, setIsMinting] = useState(false); // Nuevo estado para controlar minting
+  const [isMinting, setIsMinting] = useState(false);
+  
+  // Estado para almacenar el ID del certificado creado
+  const [certificadoId, setCertificadoId] = useState<string | null>(null);
 
   const [jsonData, setJsonData] = useState({
     description: "",
@@ -39,6 +49,73 @@ const DirectorPanel = ({ modoOscuro, signer }: DirectorPanelProps) => {
   });
 
   const certRef = useRef<HTMLDivElement>(null);
+
+  // Función para guardar certificado en Supabase
+  const guardarCertificadoEnBD = async (
+    nombreEstudiante: string,
+    institucionNombre: string,
+    walletDestinatario: string,
+    ipfsCertificado?: string,
+    ipfsMetadata?: string,
+    creadorWallet?: string
+  ) => {
+    try {
+      const { data, error } = await supabase
+        .from('certificados')
+        .insert([
+          {
+            nombre_estudiante: nombreEstudiante,
+            institucion: institucionNombre,
+            wallet_destinatario: walletDestinatario,
+            ipfs_certificado: ipfsCertificado || null,
+            ipfs_metadata: ipfsMetadata || null,
+            estado: 'emitido',
+            creado_por: creadorWallet || account || null,
+            fecha_emision: new Date().toISOString()
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error guardando en BD:', error);
+        throw error;
+      }
+
+      console.log('✅ Certificado guardado en BD:', data);
+      setCertificadoId(data.id);
+      return data;
+    } catch (error) {
+      console.error('❌ Error al guardar en base de datos:', error);
+      throw error;
+    }
+  };
+
+  // Función para actualizar certificado con hash de transacción
+  const actualizarCertificadoConTx = async (certificadoId: string, txHash: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('certificados')
+        .update({ 
+          tx_hash: txHash,
+          estado: 'minted' 
+        })
+        .eq('id', certificadoId)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error actualizando certificado:', error);
+        throw error;
+      }
+
+      console.log('✅ Certificado actualizado con TX:', data);
+      return data;
+    } catch (error) {
+      console.error('❌ Error al actualizar certificado:', error);
+      throw error;
+    }
+  };
 
   // Función para obtener el precio actual del mint
   const getMintPrice = async () => {
@@ -52,14 +129,13 @@ const DirectorPanel = ({ modoOscuro, signer }: DirectorPanelProps) => {
         if (!(window as any).ethereum) {
           throw new Error("MetaMask no está instalado");
         }
-        // Cambia esto:
         const provider = new ethers.BrowserProvider((window as any).ethereum);
         providerOrSigner = provider;
       }
       
       const contract = getCertiChainTokenContract(providerOrSigner);
       const price = await contract.mintPrice();
-      const priceInEth = ethers.formatEther(price); // Cambia utils.formatEther por formatEther
+      const priceInEth = ethers.formatEther(price);
       setMintPrice(priceInEth);
     } catch (error) {
       console.error("Error obteniendo precio:", error);
@@ -74,6 +150,27 @@ const DirectorPanel = ({ modoOscuro, signer }: DirectorPanelProps) => {
       getMintPrice();
     }
   }, [showMintForm]);
+
+  useEffect(() => {
+    if (!document.getElementById('codeGPTWidgetScript')) {
+      const script = document.createElement('script');
+      script.id = 'codeGPTWidgetScript';
+      script.type = 'module';
+      script.async = true;
+      script.defer = true;
+      script.src = 'https://widget.codegpt.co/chat-widget.js';
+      script.setAttribute('data-widget-id', '4dcf2feb-cd3d-4334-aae9-cc0f2e928926');
+      
+      document.body.appendChild(script);
+    }
+
+    return () => {
+      const existingScript = document.getElementById('codeGPTWidgetScript');
+      if (existingScript && existingScript.parentNode === document.body) {
+        document.body.removeChild(existingScript);
+      }
+    };
+  }, []);
 
   // SUBIR IMAGEN
   const handleUpload = async () => {
@@ -176,8 +273,26 @@ const DirectorPanel = ({ modoOscuro, signer }: DirectorPanelProps) => {
       const cid = result?.cid;
       if (cid) {
         const ipfsJsonLink = `https://${import.meta.env.VITE_GATEWAY_URL}/ipfs/${cid}`;
-        setUploadStatus(`✅ JSON subido exitosamente. Ver JSON: ${ipfsJsonLink}`);
+        setUploadStatus(`✅ JSON subido exitosamente.`);
         setJsonLink(ipfsJsonLink);
+        
+        // 🔥 GUARDAR EN BASE DE DATOS AQUÍ
+        try {
+          setUploadStatus("💾 Guardando certificado en base de datos...");
+          await guardarCertificadoEnBD(
+            nombre,
+            institucion,
+            walletToMint || "", // Si ya hay wallet, lo usamos, sino lo dejamos vacío por ahora
+            link, // IPFS de la imagen
+            ipfsJsonLink, // IPFS del metadata JSON
+            account // Wallet del creador
+          );
+          setUploadStatus("✅ Certificado guardado en base de datos y listo para mintear.");
+        } catch (dbError) {
+          console.error("Error guardando en BD:", dbError);
+          setUploadStatus("⚠️ JSON subido pero error al guardar en BD. Puedes continuar con el mint.");
+        }
+        
         setShowMintForm(true);
       } else {
         throw new Error("No se recibió el CID");
@@ -192,54 +307,89 @@ const DirectorPanel = ({ modoOscuro, signer }: DirectorPanelProps) => {
 
   // MINTEAR NFT
   async function mintNFT(ipfsJsonLink: string) {
-  try {
-    console.log("🔄 Conectando a contrato...");
+    try {
+      setIsMinting(true);
+      setMintStatus("🔄 Conectando a contrato...");
 
-    // Conectar con MetaMask si no está conectado
-    if (!(window as any).ethereum) {
-      throw new Error("MetaMask no está instalado.");
+      // Conectar con MetaMask si no está conectado
+      if (!(window as any).ethereum) {
+        throw new Error("MetaMask no está instalado.");
+      }
+      await (window as any).ethereum.request({ method: "eth_requestAccounts" });
+
+      // Provider y signer
+      const provider = new ethers.BrowserProvider((window as any).ethereum);
+      const signer = await provider.getSigner();
+
+      // Instanciar contrato
+      const contract = getCertiChainTokenContract(signer);
+
+      // Verificar función
+      if (typeof contract.mintPrice !== "function") {
+        throw new Error("La función mintPrice no existe en el contrato. Revisa el ABI.");
+      }
+
+      // Obtener precio
+      setMintStatus("💰 Obteniendo precio actual...");
+      const currentPrice = await contract.mintPrice();
+      console.log("💰 Precio en wei:", currentPrice.toString());
+      console.log("💰 Precio en ETH:", ethers.formatEther(currentPrice));
+      
+      // Verificar wallet
+      if (!ethers.isAddress(walletToMint)) {
+        throw new Error("Dirección de wallet inválida");
+      }
+      console.log("✅ Dirección de wallet válida:", walletToMint);
+      
+      // Si no hay certificado en BD, crear uno ahora
+      if (!certificadoId) {
+        setMintStatus("💾 Guardando certificado en base de datos...");
+        await guardarCertificadoEnBD(
+          nombre,
+          institucion,
+          walletToMint,
+          link,
+          ipfsJsonLink,
+          account
+        );
+      } else {
+        // Actualizar con la wallet destinataria si cambió
+        const { error } = await supabase
+          .from('certificados')
+          .update({ wallet_destinatario: walletToMint })
+          .eq('id', certificadoId);
+        
+        if (error) {
+          console.error('Error actualizando wallet destinataria:', error);
+        }
+      }
+      
+      // Ejecutar mint
+      setMintStatus("🚀 Ejecutando mint en blockchain...");
+      const tx = await contract.safeMint(walletToMint, ipfsJsonLink, { value: currentPrice });
+
+      setMintStatus("⏳ Esperando confirmación de blockchain...");
+      const receipt = await tx.wait();
+      console.log("✅ NFT minteado:", receipt);
+      
+      // Actualizar certificado con hash de transacción
+      if (certificadoId) {
+        setMintStatus("💾 Actualizando registro en base de datos...");
+        await actualizarCertificadoConTx(certificadoId, receipt.hash);
+      }
+      
+      setMintStatus(`✅ ¡NFT Certificate minteado exitosamente! 
+🔗 Hash de transacción: ${receipt.hash}
+💎 Token enviado a: ${walletToMint}
+📋 Metadata IPFS: ${ipfsJsonLink}`);
+
+    } catch (error: any) {
+      console.error("❌ Error en mintNFT:", error.message || error);
+      setMintStatus(`❌ Error en el mint: ${error.message || error}`);
+    } finally {
+      setIsMinting(false);
     }
-    await (window as any).ethereum.request({ method: "eth_requestAccounts" });
-
-    // Provider y signer
-    const provider = new ethers.BrowserProvider((window as any).ethereum);
-    const signer = await provider.getSigner();
-
-    // Instanciar contrato
-    const contract = getCertiChainTokenContract(signer);
-
-    // ✅ Verificar función
-    if (typeof contract.mintPrice !== "function") {
-      throw new Error("La función mintPrice no existe en el contrato. Revisa el ABI.");
-    }
-
-    // Obtener precio
-    const currentPrice = await contract.mintPrice();
-    console.log("💰 Precio en wei:", currentPrice.toString());
-
-    // Aquí usamos formatEther de la versión nueva de ethers
-    console.log("💰 Precio en ETH:", ethers.formatEther(currentPrice));
-    //verifacamos wallet
-    if (!ethers.isAddress(walletToMint)) {  // Cambia utils.isAddress por isAddress
-      alert("Dirección de wallet inválida");
-      return;
-    }
-    console.log("✅ Dirección de wallet válida:", walletToMint);
-    // Ejecutar mint
-    console.log("🚀 Ejecutando mint...");
-    const tx = await contract.safeMint(walletToMint, ipfsJsonLink, { value: currentPrice });
-
-    
-
-    console.log("⏳ Esperando confirmación...");
-    const receipt = await tx.wait();
-    console.log("✅ NFT minteado:", receipt);
-
-  } catch (error: any) {
-    console.error("❌ Error en mintNFT:", error.message || error);
   }
-}
-
 
   return (
     <div className={`min-h-screen ${modoOscuro ? "bg-gray-900" : "bg-gray-50"}`}>
@@ -426,6 +576,14 @@ const DirectorPanel = ({ modoOscuro, signer }: DirectorPanelProps) => {
                       🎯 Mint NFT Certificate - Cualquier persona puede mintear
                     </h3>
                     
+                    {certificadoId && (
+                      <div className={`mb-4 p-3 rounded-lg ${modoOscuro ? "bg-green-900 border border-green-700" : "bg-green-50 border border-green-200"}`}>
+                        <p className={`text-sm ${modoOscuro ? "text-green-200" : "text-green-800"}`}>
+                          💾 Certificado guardado en BD con ID: <code className="font-mono">{certificadoId}</code>
+                        </p>
+                      </div>
+                    )}
+                    
                     <div className={`mb-4 p-4 rounded-lg ${modoOscuro ? "bg-blue-900 border border-blue-700" : "bg-blue-50 border border-blue-200"}`}>
                       <div className="flex items-center justify-between">
                         <span className={`font-medium ${modoOscuro ? "text-blue-200" : "text-blue-800"}`}>
@@ -466,8 +624,8 @@ const DirectorPanel = ({ modoOscuro, signer }: DirectorPanelProps) => {
                       }`}
                     />
 
-                    {/* <button
-                      onClick={mintNFT}
+                    <button
+                      onClick={() => mintNFT(jsonLink)}
                       disabled={!walletToMint || !jsonLink || isLoadingPrice || isMinting}
                       className="w-full px-6 py-3 rounded-lg font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 relative overflow-hidden group"
                     >
@@ -495,14 +653,7 @@ const DirectorPanel = ({ modoOscuro, signer }: DirectorPanelProps) => {
                           : `💎 Mint Certificate NFT (${mintPrice} ETH)`
                         }
                       </span>
-                    </button> */}
-                    <button
-  onClick={() => mintNFT(jsonLink)}
-  className="bg-blue-600 text-white px-4 py-2 rounded"
->
-  Mint NFT
-</button>
-
+                    </button>
 
                     {mintStatus && (
                       <div
