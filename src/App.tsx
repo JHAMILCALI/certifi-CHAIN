@@ -72,6 +72,27 @@ const App = () => {
     setSigner(null); // Limpiar el signer al desconectar
   };
 
+  // Agregar useEffect para el widget de CodeGPT
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.id = 'codeGPTWidgetScript';
+    script.type = 'module';
+    script.async = true;
+    script.defer = true;
+    script.src = 'https://widget.codegpt.co/chat-widget.js';
+    script.setAttribute('data-widget-id', '4dcf2feb-cd3d-4334-aae9-cc0f2e928926');
+    
+    document.body.appendChild(script);
+
+    // Limpieza cuando el componente se desmonte
+    return () => {
+      const existingScript = document.getElementById('codeGPTWidgetScript');
+      if (existingScript) {
+        document.body.removeChild(existingScript);
+      }
+    };
+  }, []); // Se ejecuta solo una vez al montar el componente
+
   return (
     <div className={`min-h-screen transition-colors duration-300 relative ${modoOscuro ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
       <AnimatedBackground />
