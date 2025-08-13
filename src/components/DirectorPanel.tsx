@@ -421,64 +421,84 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
 
           <div className={`p-6 rounded-lg ${modoOscuro ? "bg-gray-800" : "bg-white shadow"}`}>
             {activeTab === "emitir" && (
-              <>
-                <div className="flex flex-col md:flex-row gap-8">
-                  {/* Formulario de datos básicos */}
-                  <div className="w-full md:w-1/2">
-                    <h2 className={`text-xl font-semibold mb-4 ${modoOscuro ? "text-white" : "text-gray-800"}`}>
-                      Emitir Nuevos Certificados
-                    </h2>
+              <>{/* -------------------------------------------------------------------------- */}
+                {/* -------------------------------------------------------------------------- */}
+<div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+  {/* Columna izquierda: formulario */}
+  <div>
+    <h2
+      className={`text-xl font-semibold mb-4 ${
+        modoOscuro ? "text-white" : "text-gray-800"
+      }`}
+    >
+      Emitir Nuevos Certificados
+    </h2>
 
-                    <input
-                      type="text"
-                      placeholder="Nombre del estudiante"
-                      value={nombre}
-                      onChange={(e) => setNombre(e.target.value)}
-                      className="mb-4 block w-full p-2 border rounded"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Institución"
-                      value={institucion}
-                      onChange={(e) => setInstitucion(e.target.value)}
-                      className="mb-4 block w-full p-2 border rounded"
-                    />
-                  </div>
+    <input
+      type="text"
+      placeholder="Nombre del estudiante"
+      value={nombre}
+      onChange={(e) => setNombre(e.target.value)}
+      className="mb-4 block w-full p-2 border rounded"
+    />
+    <input
+      type="text"
+      placeholder="Institución"
+      value={institucion}
+      onChange={(e) => setInstitucion(e.target.value)}
+      className="mb-4 block w-full p-2 border rounded"
+    />
+  </div>
 
-                  {/* Vista previa del certificado */}
-                  <div className="w-full md:w-1/2 flex justify-center">
-                    <div
-                      ref={certRef}
-                      style={{
-                        width: "800px",
-                        height: "450px",
-                        backgroundImage: `url(${certificadoImg})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                        backgroundRepeat: "no-repeat",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        fontFamily: "serif",
-                        position: "relative",
-                        boxShadow: "0 0 15px rgba(0,0,0,0.2)",
-                        borderRadius: "8px",
-                      }}
-                    >
-                      <h1 style={{ fontSize: "50px", fontWeight: "bold", marginBottom: "30px", color: "#000" }}>
-                        {nombre}
-                      </h1>
-                      <h2 style={{ fontSize: "32px", marginBottom: "10px", color: "#000" }}>
-                        {institucion}
-                      </h2>
-                      <p style={{ fontSize: "24px", color: "#000" }}>
-                        Fecha: {new Date().toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+  {/* Columna derecha: vista previa */}
+  <div className="flex justify-center">
+    <div
+      ref={certRef}
+      style={{
+        width: "800px",
+        height: "450px",
+        backgroundImage: `url(${certificadoImg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        fontFamily: "serif",
+        position: "relative",
+        boxShadow: "0 0 15px rgba(0,0,0,0.2)",
+        borderRadius: "8px",
+      }}
+    >
+      <h1
+        style={{
+          fontSize: "50px",
+          fontWeight: "bold",
+          marginBottom: "30px",
+          color: "#000",
+        }}
+      >
+        {nombre}
+      </h1>
+      <h2
+        style={{
+          fontSize: "32px",
+          marginBottom: "10px",
+          color: "#000",
+        }}
+      >
+        {institucion}
+      </h2>
+      <p style={{ fontSize: "24px", color: "#000" }}>
+        Fecha: {new Date().toLocaleDateString()}
+      </p>
+    </div>
+  </div>
+</div>
+{/* -------------------------------------------------------------------------- */}
 
+                {/* -------------------------------------------------------------------------- */}
                 {/* Botón subir imagen */}
                 <div className="mt-6 flex justify-center">
                   <button
