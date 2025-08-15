@@ -396,7 +396,7 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className={`p-6 rounded-lg ${modoOscuro ? "bg-gray-800" : "bg-white shadow"}`}>
           <h1 className={`text-3xl font-bold mb-6 ${modoOscuro ? "text-white" : "text-gray-800"}`}>
-            Panel de Director/Administrativo
+            Panel de Director/Administrativo 
           </h1>
 
           <div className={`flex border-b mb-6 ${modoOscuro ? "border-gray-700" : "border-gray-200"}`}>
@@ -423,8 +423,8 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
             {activeTab === "emitir" && (
               <>{/* -------------------------------------------------------------------------- */}
                 {/* -------------------------------------------------------------------------- */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-  {/* Columna izquierda: formulario */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+  {/* Columna izquierda */}
   <div>
     <h2
       className={`text-xl font-semibold mb-4 ${
@@ -450,76 +450,117 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
     />
   </div>
 
-  {/* Columna derecha: vista previa */}
+  {/* Columna derecha */}
   <div className="flex justify-center">
     <div
       ref={certRef}
       style={{
-        width: "800px",
-        height: "450px",
+        width: "100%",
+        maxWidth: "700px",
+        aspectRatio: "1086 / 768",
         backgroundImage: `url(${certificadoImg})`,
-        backgroundSize: "cover",
+        backgroundSize: "contain",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        fontFamily: "serif",
         position: "relative",
-        boxShadow: "0 0 15px rgba(0,0,0,0.2)",
-        borderRadius: "8px",
+        fontFamily: "serif",
       }}
     >
-      <h1
+      {/* Nombre */}
+      <div
         style={{
-          fontSize: "50px",
+          position: "absolute",
+          top: "38%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          fontSize: `${Math.max(1.5, 3 - nombre.length * 0.05)}vw`, // 🔹 auto ajuste
           fontWeight: "bold",
-          marginBottom: "30px",
           color: "#000",
+          textAlign: "center",
+          whiteSpace: "nowrap",
+          maxWidth: "80%", // evita que toque los bordes
+          overflow: "hidden",
+          textOverflow: "ellipsis",
         }}
       >
         {nombre}
-      </h1>
-      <h2
+      </div>
+
+      {/* Institución */}
+      <div
         style={{
-          fontSize: "32px",
-          marginBottom: "10px",
+          position: "absolute",
+          top: "48%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          fontSize: `${Math.max(1.3, 2.5 - institucion.length * 0.04)}vw`, // 🔹 auto ajuste
           color: "#000",
+          textAlign: "center",
+          whiteSpace: "nowrap",
+          maxWidth: "80%",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
         }}
       >
         {institucion}
-      </h2>
-      <p style={{ fontSize: "24px", color: "#000" }}>
-        Fecha: {new Date().toLocaleDateString()}
-      </p>
+      </div>
+
+      {/* Fecha */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "22%",
+          top: "52%",
+          left: "25%",
+          fontSize: "1.2vw",
+          color: "#000",
+        }}
+      >
+        {new Date().toLocaleDateString()}
+      </div>
     </div>
   </div>
 </div>
-{/* -------------------------------------------------------------------------- */}
 
                 {/* -------------------------------------------------------------------------- */}
                 {/* Botón subir imagen */}
                 <div className="mt-6 flex justify-center">
-                  <button
-                    onClick={handleUpload}
-                    className="px-6 py-3 rounded-lg font-semibold shadow transition-all duration-200 relative overflow-hidden group"
-                  >
-                    <span
-                      className="absolute inset-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
-                      style={{
-                        background: "linear-gradient(270deg, #ff0080, #7928ca, #00ffea, #ff0080)",
-                        backgroundSize: "600% 600%",
-                        animation: "rgbGlow 2s linear infinite",
-                        filter: "blur(12px)",
-                      }}
-                    />
-                    <span className={`absolute inset-0 ${modoOscuro ? "bg-blue-600" : "bg-blue-500"} rounded-lg`} />
-                    <span className="relative z-10 text-white">
-                      Generar y Subir Certificado
-                    </span>
-                  </button>
-                </div>
+  <button
+    onClick={handleUpload}
+    className="px-6 py-3 rounded-lg font-semibold shadow transition-all duration-200 relative overflow-hidden group"
+  >
+    {/* Fondo azul fijo */}
+    <span className={`absolute inset-0 ${modoOscuro ? "bg-blue-600" : "bg-blue-500"} rounded-lg`} />
+
+    {/* Glow encima */}
+    <span
+      className="absolute inset-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+      style={{
+        background: "linear-gradient(270deg, #ff0080, #7928ca, #00ffea, #ff0080)",
+        backgroundSize: "600% 600%",
+        animation: "rgbGlow 2s linear infinite",
+        filter: "blur(12px)",
+        zIndex: 1,
+      }}
+    />
+
+    {/* Texto */}
+    <span className="relative z-10 text-white">
+      Generar y Subir Certificado
+    </span>
+
+    <style>
+      {`
+        @keyframes rgbGlow {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}
+    </style>
+  </button>
+</div>
+
 
                 {/* Formulario JSON */}
                 {showJsonForm && (
