@@ -392,378 +392,344 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
   }
 
   return (
-    <div className={`min-h-screen ${modoOscuro ? "bg-gray-900" : "bg-gray-50"}`}>
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className={`p-6 rounded-lg ${modoOscuro ? "bg-gray-800" : "bg-white shadow"}`}>
-          <h1 className={`text-3xl font-bold mb-6 ${modoOscuro ? "text-white" : "text-gray-800"}`}>
-            Panel de Director/Administrativo 
-          </h1>
+  <div className={`min-h-screen ${modoOscuro ? "bg-gray-900" : "bg-gray-50"}`}>
+    {/* Contenedor principal (95% del ancho en pantallas grandes, con máximo de 1800px) */}
+    <div className="mx-auto py-10 w-full lg:w-[95%] xl:max-w-[1800px] 2xl:max-w-[2000px]">
+      
+      {/* Contenedor interno (padding grande + sombra pronunciada) */}
+      <div className={`p-10 md:p-16 lg:p-20 rounded-2xl ${modoOscuro ? "bg-gray-800" : "bg-white shadow-2xl"}`}>
+        
+        {/* Título principal (texto gigante) */}
+        <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-12 ${modoOscuro ? "text-white" : "text-gray-800"}`}>
+          Panel de Director/Administrativo
+        </h1>
 
-          <div className={`flex border-b mb-6 ${modoOscuro ? "border-gray-700" : "border-gray-200"}`}>
-            {["emitir", "verificar", "historial", "reportes"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 font-medium capitalize ${
-                  modoOscuro ? "text-gray-300" : "text-gray-600"
-                } ${
-                  activeTab === tab
-                    ? modoOscuro
-                      ? "border-b-2 border-blue-500 text-white"
-                      : "border-b-2 border-blue-500 text-blue-600"
-                    : ""
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
+        {/* Pestañas (botones grandes) */}
+        <div className={`flex border-b-2 mb-12 ${modoOscuro ? "border-gray-700" : "border-gray-200"}`}>
+          {["emitir", "verificar", "historial", "reportes"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-8 py-4 text-xl md:text-2xl font-medium capitalize ${
+                modoOscuro ? "text-gray-300" : "text-gray-600"
+              } ${
+                activeTab === tab
+                  ? modoOscuro
+                    ? "border-b-4 border-blue-500 text-white"
+                    : "border-b-4 border-blue-500 text-blue-600"
+                  : ""
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
 
-          <div className={`p-6 rounded-lg ${modoOscuro ? "bg-gray-800" : "bg-white shadow"}`}>
-            {activeTab === "emitir" && (
-              <>{/* -------------------------------------------------------------------------- */}
-                {/* -------------------------------------------------------------------------- */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-  {/* Columna izquierda */}
-  <div>
-    <h2
-      className={`text-xl font-semibold mb-4 ${
-        modoOscuro ? "text-white" : "text-gray-800"
-      }`}
-    >
-      Emitir Nuevos Certificados
-    </h2>
+        {/* Contenido principal (espaciado amplio) */}
+        <div className={`p-10 md:p-12 rounded-xl ${modoOscuro ? "bg-gray-700" : "bg-gray-50 shadow-lg"}`}>
+          {activeTab === "emitir" && (
+            <>
+              {/* Grid de 2 columnas (formulario + certificado) */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
+                
+                {/* Columna izquierda: Formulario */}
+                <div className="space-y-8">
+                  <h2 className={`text-3xl font-semibold ${modoOscuro ? "text-white" : "text-gray-800"}`}>
+                    Emitir Nuevos Certificados
+                  </h2>
 
-    <input
-      type="text"
-      placeholder="Nombre del estudiante"
-      value={nombre}
-      onChange={(e) => setNombre(e.target.value)}
-      className="mb-4 block w-full p-2 border rounded"
-    />
-    <input
-      type="text"
-      placeholder="Institución"
-      value={institucion}
-      onChange={(e) => setInstitucion(e.target.value)}
-      className="mb-4 block w-full p-2 border rounded"
-    />
-  </div>
+                  <input
+                    type="text"
+                    placeholder="Nombre del estudiante"
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
+                    className={`w-full p-4 text-xl rounded-xl border-2 ${
+                      modoOscuro 
+                        ? "bg-gray-600 border-gray-500 text-white placeholder-gray-400" 
+                        : "bg-white border-gray-300 text-gray-900"
+                    }`}
+                  />
 
-  {/* Columna derecha */}
-  <div className="flex justify-center">
-    <div
-      ref={certRef}
-      style={{
-        width: "100%",
-        maxWidth: "700px",
-        aspectRatio: "1086 / 768",
-        backgroundImage: `url(${certificadoImg})`,
-        backgroundSize: "contain",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        position: "relative",
-        fontFamily: "serif",
-      }}
-    >
-      {/* Nombre */}
-      <div
-        style={{
-          position: "absolute",
-          top: "38%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          fontSize: `${Math.max(1.5, 3 - nombre.length * 0.05)}vw`, // 🔹 auto ajuste
-          fontWeight: "bold",
-          color: "#000",
-          textAlign: "center",
-          whiteSpace: "nowrap",
-          maxWidth: "80%", // evita que toque los bordes
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
-      >
-        {nombre}
-      </div>
+                  <input
+                    type="text"
+                    placeholder="Institución"
+                    value={institucion}
+                    onChange={(e) => setInstitucion(e.target.value)}
+                    className={`w-full p-4 text-xl rounded-xl border-2 ${
+                      modoOscuro 
+                        ? "bg-gray-600 border-gray-500 text-white placeholder-gray-400" 
+                        : "bg-white border-gray-300 text-gray-900"
+                    }`}
+                  />
+                </div>
 
-      {/* Institución */}
-      <div
-        style={{
-          position: "absolute",
-          top: "48%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          fontSize: `${Math.max(1.3, 2.5 - institucion.length * 0.04)}vw`, // 🔹 auto ajuste
-          color: "#000",
-          textAlign: "center",
-          whiteSpace: "nowrap",
-          maxWidth: "80%",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
-      >
-        {institucion}
-      </div>
-
-      {/* Fecha */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "22%",
-          top: "52%",
-          left: "25%",
-          fontSize: "1.2vw",
-          color: "#000",
-        }}
-      >
-        {new Date().toLocaleDateString()}
-      </div>
-    </div>
-  </div>
-</div>
-
-                {/* -------------------------------------------------------------------------- */}
-                {/* Botón subir imagen */}
-                <div className="mt-6 flex justify-center">
-  <button
-    onClick={handleUpload}
-    className="px-6 py-3 rounded-lg font-semibold shadow transition-all duration-200 relative overflow-hidden group"
-  >
-    {/* Fondo azul fijo */}
-    <span className={`absolute inset-0 ${modoOscuro ? "bg-blue-600" : "bg-blue-500"} rounded-lg`} />
-
-    {/* Glow encima */}
-    <span
-      className="absolute inset-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
-      style={{
-        background: "linear-gradient(270deg, #ff0080, #7928ca, #00ffea, #ff0080)",
-        backgroundSize: "600% 600%",
-        animation: "rgbGlow 2s linear infinite",
-        filter: "blur(12px)",
-        zIndex: 1,
-      }}
-    />
-
-    {/* Texto */}
-    <span className="relative z-10 text-white">
-      Generar y Subir Certificado
-    </span>
-
-    <style>
-      {`
-        @keyframes rgbGlow {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-      `}
-    </style>
-  </button>
-</div>
-
-
-                {/* Formulario JSON */}
-                {showJsonForm && (
-                  <div className="mt-8">
-                    <h3 className={`text-lg font-semibold mb-4 ${modoOscuro ? "text-white" : "text-gray-800"}`}>
-                      Subir Metadata JSON
-                    </h3>
-                    <input
-                      type="text"
-                      placeholder="Descripción del certificado"
-                      value={jsonData.description}
-                      onChange={(e) => setJsonData({ ...jsonData, description: e.target.value })}
-                      className="mb-2 block w-full p-2 border rounded"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Nombre del certificado"
-                      value={jsonData.name}
-                      onChange={(e) => setJsonData({ ...jsonData, name: e.target.value })}
-                      className="mb-2 block w-full p-2 border rounded"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Base/Curso"
-                      value={jsonData.base}
-                      onChange={(e) => setJsonData({ ...jsonData, base: e.target.value })}
-                      className="mb-2 block w-full p-2 border rounded"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Contenido/Especialidad"
-                      value={jsonData.content}
-                      onChange={(e) => setJsonData({ ...jsonData, content: e.target.value })}
-                      className="mb-4 block w-full p-2 border rounded"
-                    />
-                    <button
-                      onClick={handleJsonUpload}
-                      className="px-6 py-2 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600 transition-colors"
+                {/* Columna derecha: Certificado (con tamaño flexible) */}
+                <div className="flex justify-center w-full">
+                  <div
+                    ref={certRef}
+                    className="relative w-full max-w-[900px]"
+                    style={{
+                      aspectRatio: "1086 / 768",
+                      backgroundImage: `url(${certificadoImg})`,
+                      backgroundSize: "contain",
+                      backgroundPosition: "center",
+                      backgroundRepeat: "no-repeat",
+                      fontFamily: "serif",
+                    }}
+                  >
+                    {/* Nombre (texto dinámico) */}
+                    <div 
+                      className="absolute top-[38%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis"
+                      style={{
+                        fontSize: `${Math.max(1.5, 3 - nombre.length * 0.03)}vw`,
+                        maxWidth: "85%",
+                        top: "36%",
+                      }}
                     >
-                      Subir JSON a IPFS
-                    </button>
-                  </div>
-                )}
+                      {nombre}
+                    </div>
 
-                {uploadStatus && (
-                  <div className={`mt-4 p-3 rounded text-center ${
-                    uploadStatus.includes("✅")
-                      ? modoOscuro ? "bg-green-800 text-green-200" : "bg-green-100 text-green-700"
-                      : uploadStatus.includes("❌")
-                      ? modoOscuro ? "bg-red-800 text-red-200" : "bg-red-100 text-red-700"
-                      : modoOscuro ? "bg-blue-800 text-blue-200" : "bg-blue-100 text-blue-700"
-                  }`}>
-                    {uploadStatus}
-                  </div>
-                )}
-
-                {link && (
-                  <div className="mt-4 text-center">
-                    <a
-                      href={link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline text-blue-400 hover:text-blue-300"
+                    {/* Institución */}
+                    <div 
+                      className="absolute top-[48%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-black whitespace-nowrap overflow-hidden text-ellipsis"
+                      style={{
+                        fontSize: `${Math.max(1.2, 2.5 - institucion.length * 0.03)}vw`,
+                        maxWidth: "85%",
+                      }}
                     >
-                      🔗 Ver Certificado en IPFS
-                    </a>
-                  </div>
-                )}
+                      {institucion}
+                    </div>
 
-                {/* FORMULARIO DE MINT */}
-                {showMintForm && (
-                  <div className="mt-8">
-                    <h3 className={`text-lg font-semibold mb-4 ${modoOscuro ? "text-white" : "text-gray-800"}`}>
-                      🎯 Mint NFT Certificate - Cualquier persona puede mintear
-                    </h3>
-                    
-                    {certificadoId && (
-                      <div className={`mb-4 p-3 rounded-lg ${modoOscuro ? "bg-green-900 border border-green-700" : "bg-green-50 border border-green-200"}`}>
-                        <p className={`text-sm ${modoOscuro ? "text-green-200" : "text-green-800"}`}>
-                          💾 Certificado guardado en BD con ID: <code className="font-mono">{certificadoId}</code>
-                        </p>
-                      </div>
-                    )}
-                    
-                    <div className={`mb-4 p-4 rounded-lg ${modoOscuro ? "bg-blue-900 border border-blue-700" : "bg-blue-50 border border-blue-200"}`}>
-                      <div className="flex items-center justify-between">
-                        <span className={`font-medium ${modoOscuro ? "text-blue-200" : "text-blue-800"}`}>
-                          💰 Costo del certificado NFT:
-                        </span>
-                        <span className={`font-bold text-xl ${modoOscuro ? "text-blue-100" : "text-blue-900"}`}>
-                          {isLoadingPrice ? "⏳ Cargando..." : `${mintPrice} ETH`}
-                        </span>
-                      </div>
-                      <p className={`text-sm mt-2 ${modoOscuro ? "text-blue-300" : "text-blue-600"}`}>
-                        🌍 Cualquier persona con MetaMask puede pagar y mintear este certificado
+                    {/* Fecha */}
+                    <div 
+                      className="absolute text-black"
+                      style={{
+                        bottom: "22%",
+                        left: "24%",
+                        top: "52%",
+                        fontSize: "1.3vw",
+                      }}
+                    >
+                      {new Date().toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botón de acción principal */}
+              <div className="mt-16 flex justify-center">
+                <button
+                  onClick={handleUpload}
+                  className={`px-12 py-5 text-xl rounded-xl font-bold transition-all duration-200 relative overflow-hidden ${
+                    modoOscuro ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-500 hover:bg-blue-600"
+                  }`}
+                >
+                  <span className="relative z-10 text-white">
+                    Generar y Subir Certificado
+                  </span>
+                </button>
+              </div>
+
+              {/* Sección de Metadata JSON */}
+              {showJsonForm && (
+                <div className="mt-16 space-y-6">
+                  <h3 className={`text-2xl font-semibold ${modoOscuro ? "text-white" : "text-gray-800"}`}>
+                    Subir Metadata JSON
+                  </h3>
+                  <input
+                    type="text"
+                    placeholder="Descripción del certificado"
+                    value={jsonData.description}
+                    onChange={(e) => setJsonData({ ...jsonData, description: e.target.value })}
+                    className={`w-full p-4 text-xl rounded-xl border-2 ${
+                      modoOscuro 
+                        ? "bg-gray-600 border-gray-500 text-white" 
+                        : "bg-white border-gray-300"
+                    }`}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Nombre del certificado"
+                    value={jsonData.name}
+                    onChange={(e) => setJsonData({ ...jsonData, name: e.target.value })}
+                    className={`w-full p-4 text-xl rounded-xl border-2 ${
+                      modoOscuro 
+                        ? "bg-gray-600 border-gray-500 text-white" 
+                        : "bg-white border-gray-300"
+                    }`}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Base/Curso"
+                    value={jsonData.base}
+                    onChange={(e) => setJsonData({ ...jsonData, base: e.target.value })}
+                    className={`w-full p-4 text-xl rounded-xl border-2 ${
+                      modoOscuro 
+                        ? "bg-gray-600 border-gray-500 text-white" 
+                        : "bg-white border-gray-300"
+                    }`}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Contenido/Especialidad"
+                    value={jsonData.content}
+                    onChange={(e) => setJsonData({ ...jsonData, content: e.target.value })}
+                    className={`w-full p-4 text-xl rounded-xl border-2 ${
+                      modoOscuro 
+                        ? "bg-gray-600 border-gray-500 text-white" 
+                        : "bg-white border-gray-300"
+                    }`}
+                  />
+                  <button
+                    onClick={handleJsonUpload}
+                    className="px-8 py-4 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600 transition-colors text-lg"
+                  >
+                    Subir JSON a IPFS
+                  </button>
+                </div>
+              )}
+
+              {uploadStatus && (
+                <div className={`mt-8 p-5 rounded-xl text-center text-xl ${
+                  uploadStatus.includes("✅")
+                    ? modoOscuro ? "bg-green-800 text-green-200" : "bg-green-100 text-green-700"
+                    : uploadStatus.includes("❌")
+                    ? modoOscuro ? "bg-red-800 text-red-200" : "bg-red-100 text-red-700"
+                    : modoOscuro ? "bg-blue-800 text-blue-200" : "bg-blue-100 text-blue-700"
+                }`}>
+                  {uploadStatus}
+                </div>
+              )}
+
+              {link && (
+                <div className="mt-8 text-center">
+                  <a
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 text-xl underline"
+                  >
+                    🔗 Ver Certificado en IPFS
+                  </a>
+                </div>
+              )}
+
+              {/* FORMULARIO DE MINT */}
+              {showMintForm && (
+                <div className="mt-16 space-y-8">
+                  <h3 className={`text-2xl font-semibold ${modoOscuro ? "text-white" : "text-gray-800"}`}>
+                    🎯 Mint NFT Certificate - Cualquier persona puede mintear
+                  </h3>
+                  
+                  {certificadoId && (
+                    <div className={`p-5 rounded-xl ${
+                      modoOscuro ? "bg-green-900 border border-green-700" : "bg-green-50 border border-green-200"
+                    }`}>
+                      <p className={`text-xl ${modoOscuro ? "text-green-200" : "text-green-800"}`}>
+                        💾 Certificado guardado en BD con ID: <code className="font-mono">{certificadoId}</code>
                       </p>
                     </div>
-
-                    <div className="mb-4">
-                      <span className={`text-sm ${modoOscuro ? "text-gray-400" : "text-gray-600"}`}>
-                        📋 JSON Metadata IPFS:
+                  )}
+                  
+                  <div className={`p-6 rounded-xl ${
+                    modoOscuro ? "bg-blue-900 border border-blue-700" : "bg-blue-50 border border-blue-200"
+                  }`}>
+                    <div className="flex items-center justify-between">
+                      <span className={`font-medium text-xl ${modoOscuro ? "text-blue-200" : "text-blue-800"}`}>
+                        💰 Costo del certificado NFT:
                       </span>
-                      <a
-                        href={jsonLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block underline text-blue-400 break-all hover:text-blue-300"
-                      >
-                        {jsonLink}
-                      </a>
-                    </div>
-
-                    <input
-                      type="text"
-                      placeholder="Dirección wallet destinataria (0x...)"
-                      value={walletToMint}
-                      onChange={(e) => setWalletToMint(e.target.value)}
-                      className={`mb-4 block w-full p-3 border rounded-lg ${
-                        modoOscuro 
-                          ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" 
-                          : "bg-white border-gray-300 text-gray-900"
-                      }`}
-                    />
-
-                    <button
-                      onClick={() => mintNFT(jsonLink)}
-                      disabled={!walletToMint || !jsonLink || isLoadingPrice || isMinting}
-                      className="w-full px-6 py-3 rounded-lg font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 relative overflow-hidden group"
-                    >
-                      <span
-                        className="absolute inset-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
-                        style={{
-                          background: "linear-gradient(270deg, #00d4aa, #00a8ff, #0078ff, #00d4aa)",
-                          backgroundSize: "600% 600%",
-                          animation: "rgbGlow 2s linear infinite",
-                          filter: "blur(8px)",
-                        }}
-                      />
-                      <span
-                        className={`absolute inset-0 ${
-                          !walletToMint || !jsonLink || isLoadingPrice || isMinting
-                            ? "bg-gray-400"
-                            : "bg-green-600 hover:bg-green-700"
-                        } rounded-lg`}
-                      />
-                      <span className="relative z-10 text-white">
-                        {isLoadingPrice 
-                          ? "⏳ Cargando precio..." 
-                          : isMinting
-                          ? "⏳ Minteando..."
-                          : `💎 Mint Certificate NFT (${mintPrice} ETH)`
-                        }
+                      <span className={`font-bold text-2xl ${modoOscuro ? "text-blue-100" : "text-blue-900"}`}>
+                        {isLoadingPrice ? "⏳ Cargando..." : `${mintPrice} ETH`}
                       </span>
-                    </button>
-
-                    {mintStatus && (
-                      <div
-                        className={`mt-4 p-4 rounded-lg whitespace-pre-line ${
-                          mintStatus.includes("✅")
-                            ? modoOscuro 
-                              ? "bg-green-800 text-green-100 border border-green-600" 
-                              : "bg-green-100 text-green-800 border border-green-300"
-                            : modoOscuro 
-                              ? "bg-red-800 text-red-100 border border-red-600" 
-                              : "bg-red-100 text-red-800 border border-red-300"
-                        }`}
-                      >
-                        {mintStatus}
-                      </div>
-                    )}
-
-                    <div className="mt-4 text-center">
-                      <button
-                        onClick={getMintPrice}
-                        disabled={isLoadingPrice}
-                        className={`text-sm px-4 py-2 rounded ${
-                          modoOscuro 
-                            ? "bg-gray-700 text-gray-300 hover:bg-gray-600" 
-                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                        } disabled:opacity-50`}
-                      >
-                        {isLoadingPrice ? "⏳ Actualizando..." : "🔄 Actualizar precio"}
-                      </button>
                     </div>
+                    <p className={`text-xl mt-3 ${modoOscuro ? "text-blue-300" : "text-blue-600"}`}>
+                      🌍 Cualquier persona con MetaMask puede pagar y mintear este certificado
+                    </p>
                   </div>
-                )}
 
-                <style>
-                  {`
-                    @keyframes rgbGlow {
-                      0% { background-position: 0% 50%; }
-                      50% { background-position: 100% 50%; }
-                      100% { background-position: 0% 50%; }
-                    }
-                  `}
-                </style>
-              </>
-            )}
-          </div>
+                  <div className="space-y-4">
+                    <span className={`text-xl ${modoOscuro ? "text-gray-400" : "text-gray-600"}`}>
+                      📋 JSON Metadata IPFS:
+                    </span>
+                    <a
+                      href={jsonLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-blue-400 hover:text-blue-300 text-lg underline break-all"
+                    >
+                      {jsonLink}
+                    </a>
+                  </div>
+
+                  <input
+                    type="text"
+                    placeholder="Dirección wallet destinataria (0x...)"
+                    value={walletToMint}
+                    onChange={(e) => setWalletToMint(e.target.value)}
+                    className={`w-full p-4 text-xl rounded-xl border-2 ${
+                      modoOscuro 
+                        ? "bg-gray-600 border-gray-500 text-white placeholder-gray-400" 
+                        : "bg-white border-gray-300 text-gray-900"
+                    }`}
+                  />
+
+                  <button
+                    onClick={() => mintNFT(jsonLink)}
+                    disabled={!walletToMint || !jsonLink || isLoadingPrice || isMinting}
+                    className={`w-full p-5 text-xl rounded-xl font-bold transition-all duration-200 relative overflow-hidden ${
+                      !walletToMint || !jsonLink || isLoadingPrice || isMinting
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : modoOscuro 
+                          ? "bg-green-600 hover:bg-green-700" 
+                          : "bg-green-500 hover:bg-green-600"
+                    }`}
+                  >
+                    <span className="relative z-10 text-white">
+                      {isLoadingPrice 
+                        ? "⏳ Cargando precio..." 
+                        : isMinting
+                        ? "⏳ Minteando..."
+                        : `💎 Mint Certificate NFT (${mintPrice} ETH)`
+                      }
+                    </span>
+                  </button>
+
+                  {mintStatus && (
+                    <div className={`p-5 rounded-xl whitespace-pre-line text-xl ${
+                      mintStatus.includes("✅")
+                        ? modoOscuro 
+                          ? "bg-green-800 text-green-100 border border-green-600" 
+                          : "bg-green-100 text-green-800 border border-green-300"
+                        : modoOscuro 
+                          ? "bg-red-800 text-red-100 border border-red-600" 
+                          : "bg-red-100 text-red-800 border border-red-300"
+                    }`}>
+                      {mintStatus}
+                    </div>
+                  )}
+
+                  <div className="flex justify-center">
+                    <button
+                      onClick={getMintPrice}
+                      disabled={isLoadingPrice}
+                      className={`px-8 py-3 text-lg rounded-xl ${
+                        modoOscuro 
+                          ? "bg-gray-700 text-gray-300 hover:bg-gray-600" 
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      } disabled:opacity-50`}
+                    >
+                      {isLoadingPrice ? "⏳ Actualizando..." : "🔄 Actualizar precio"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default DirectorPanel;
