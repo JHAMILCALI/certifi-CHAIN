@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true, // permite acceso desde la red local
-    port: 5173, // puedes cambiar el puerto si deseas
+    port: 5176, // puedes cambiar el puerto si deseas
     proxy: {
       '/presigned_url': {
         target: 'http://localhost:5000', // URL de tu backend
