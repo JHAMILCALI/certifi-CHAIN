@@ -4,7 +4,9 @@ import { PinataSDK } from "pinata";
 import certificadoImg from "../assets/certificado.jpg";
 import { ethers } from "ethers";
 import { getCertiChainTokenContract } from "../contracts/CertiChainToken";
+import { QRCodeSVG } from 'qrcode.react';
 import { createClient } from '@supabase/supabase-js';
+import { v4 as uuidv4 } from "uuid";
 
 interface DirectorPanelProps {
   account: string;
@@ -39,7 +41,7 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
   const [isMinting, setIsMinting] = useState(false);
   
   // Estado para almacenar el ID del certificado creado
-  const [certificadoId, setCertificadoId] = useState<string | null>(null);
+  const [certificadoId, setCertificadoId] = useState<string>(uuidv4());
 
   const [jsonData, setJsonData] = useState({
     description: "",
@@ -64,6 +66,7 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
         .from('certificados')
         .insert([
           {
+            id: certificadoId, // Usar el ID generado
             nombre_estudiante: nombreEstudiante,
             institucion: institucionNombre,
             wallet_destinatario: walletDestinatario,
@@ -438,6 +441,13 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
                     Emitir Nuevos Certificados
                   </h2>
 
+                  {/* <p className={`mt-2 text-sm ${modoOscuro ? "text-gray-400" : "text-gray-600"}`}>
+                    ID del certificado: <span className="font-mono">{certificadoId}</span>
+                  </p>
+                  <div style={{ marginTop: '20px' }}>
+                    <QRCodeSVG value={`${"http://localhost:5176"}/${certificadoId}`} size={256}/>
+                  </div> */}
+
                   <input
                     type="text"
                     placeholder="Nombre del estudiante"
@@ -477,6 +487,11 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
                       fontFamily: "serif",
                     }}
                   >
+                    {/* QR (gener QR con ID) */}
+                    <div
+                      className="absolute top-4 right-4">
+                      <QRCodeSVG value={`${"https://certifi-chain.vercel.app"}/${certificadoId}`} size={80}/>
+                    </div>
                     {/* Nombre (texto dinámico) */}
                     <div 
                       className="absolute top-[38%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis"
