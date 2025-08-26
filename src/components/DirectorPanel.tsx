@@ -7,6 +7,7 @@ import { getCertiChainTokenContract } from "../contracts/CertiChainToken";
 import { QRCodeSVG } from "qrcode.react";
 import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
+import img1 from "../assets/logo QR.png";
 
 interface DirectorPanelProps {
   account: string;
@@ -527,7 +528,7 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
                           value={`${"https://certifi-chain.vercel.app"}/${certificadoId}`}
                           size={80}
                           imageSettings={{
-                            src: "https://github.com/JHAMILCALI/certifi-CHAIN/blob/main/src/assets/logo2.svg",
+                            src: img1,
                             x: undefined,
                             y: undefined,
                             height: 24,
