@@ -527,15 +527,6 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
                         <QRCodeSVG
                           value={`${"https://certifi-chain.vercel.app"}/${certificadoId}`}
                           size={80}
-                          imageSettings={{
-                            src: img1,
-                            x: undefined,
-                            y: undefined,
-                            height: 24,
-                            width: 24,
-                            opacity: 1,
-                            excavate: true,
-                          }}
                         />
                       </div>
                       {/* Nombre (texto dinámico) */}
