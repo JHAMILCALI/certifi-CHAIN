@@ -7,7 +7,6 @@ import { getCertiChainTokenContract } from "../contracts/CertiChainToken";
 import { QRCodeSVG } from "qrcode.react";
 import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
-import logo from "../assets/logo2.svg";
 
 interface DirectorPanelProps {
   account: string;
