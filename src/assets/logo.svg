@@ -1,0 +1,46 @@
+<svg width="780" height="240" viewBox="0 0 1000 240" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CertifyChain logo">
+  <defs>
+    <style>
+      :root {
+        --glow: #3b82f6; /* azul brillante */
+        --dark: #1e3a8a; /* azul profundo */
+        --white: #ffffff;
+      }
+      .stroke { stroke: var(--glow); stroke-width: 4; }
+      .fill { fill: var(--dark); }
+      .text { font-family: 'Segoe UI', Inter, Arial, sans-serif; font-weight: 700; }
+    </style>
+    <!-- Efecto glow -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#3b82f6" flood-opacity="1"/>
+    </filter>
+  </defs>
+
+  <!-- Isotipo -->
+  <g transform="translate(20,20)">
+    <!-- Cubo superior -->
+    <polygon points="110,20 150,45 110,70 70,45" class="stroke fill" filter="url(#glow)"/>
+    <polygon points="70,45 110,70 110,110 70,85" class="stroke fill" filter="url(#glow)"/>
+    <polygon points="150,45 110,70 110,110 150,85" class="stroke fill" filter="url(#glow)"/>
+
+    <!-- Cubo inferior izquierdo -->
+    <polygon points="40,100 80,125 40,150 0,125" class="stroke fill" filter="url(#glow)"/>
+    <polygon points="0,125 40,150 40,190 0,165" class="stroke fill" filter="url(#glow)"/>
+    <polygon points="80,125 40,150 40,190 80,165" class="stroke fill" filter="url(#glow)"/>
+
+    <!-- Cubo inferior derecho -->
+    <polygon points="180,100 220,125 180,150 140,125" class="stroke fill" filter="url(#glow)"/>
+    <polygon points="140,125 180,150 180,190 140,165" class="stroke fill" filter="url(#glow)"/>
+    <polygon points="220,125 180,150 180,190 220,165" class="stroke fill" filter="url(#glow)"/>
+
+    <!-- Check central -->
+    <path d="M85 125 l20 20 l40 -40" stroke="var(--white)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  </g>
+
+  <!-- Wordmark -->
+  <g transform="translate(300,140)">
+    <text x="0" y="0" font-size="120" class="text" fill="var(--white)">
+      Certify<tspan fill="var(--glow)">Chain</tspan>
+    </text>
+  </g>
+</svg>

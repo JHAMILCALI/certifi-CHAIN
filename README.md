@@ -1,4 +1,8 @@
-# 📜 CertyfChain  
+<div align="center">
+  <img src="./src/assets/logo.svg" alt="CertifyChain Logo" width="200"/>
+</div>
+
+
 
 **CertyfChain** es una plataforma descentralizada para la **emisión, gestión y verificación de certificados académicos en formato NFT (ERC-721)**.  
 El proyecto busca brindar **transparencia, inmutabilidad y trazabilidad** a los procesos de certificación utilizando **blockchain** y almacenamiento en **IPFS (Pinata)**.  
@@ -123,7 +127,8 @@ npm run dev
 ```
 
 La aplicación estará disponible en:  
-👉 `https://certifi-chain.vercel.app/`  
+[👉Visita CertifyChain](https://certifi-chain.vercel.app/)
+ 
 
 ---
 
