@@ -6,6 +6,7 @@ import AdminPanel from './components/AdminPanel';
 import DirectorPanel from './components/DirectorPanel';
 import StudentPanel from './components/StudentPanel';
 import AnimatedBackground from './components/AnimatedBackground';
+import logo from './assets/logo.svg';
 
 // Tipos para los roles
 type UserRole = 'admin' | 'director' | 'student' | null;
@@ -116,47 +117,58 @@ const App = () => {
       <AnimatedBackground />
       {/* Encabezado común para todos los roles */}
       <header className={`shadow-sm relative z-10 ${modoOscuro ? 'bg-gray-800' : 'bg-white'}`}>
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${modoOscuro ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'}`}>
-                NFT
-              </div>
-              <span className={`ml-3 text-xl font-semibold ${modoOscuro ? 'text-white' : 'text-gray-800'}`}>
-                CertifyChain
-                {userRole && (
-                  <span className="ml-2 text-sm capitalize">
-                    ({userRole})
-                  </span>
-                )}
-              </span>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              {/* Botón de modo oscuro/claro */}
-              <button onClick={alternarModo} className={`p-2 rounded-full ${modoOscuro ? 'bg-gray-700 text-yellow-300' : 'bg-gray-200 text-gray-700'}`}>
-                {modoOscuro ? '☀️' : '🌙'}
-              </button>
-
-              {/* Estado de conexión */}
-              {account && (
-                <div className="flex items-center space-x-3">
-                  <span className={`text-sm ${modoOscuro ? 'text-gray-300' : 'text-gray-600'}`}>
-                    {`${account.substring(0, 6)}...${account.substring(account.length - 4)}`}
-                  </span>
-                  <button 
-                    onClick={desconectar}
-                    className={`px-3 py-1 rounded-lg text-sm ${modoOscuro ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-500 hover:bg-red-600 text-white'}`}
-                    disabled={loading}
-                  >
-                    Desconectar
-                  </button>
-                </div>
-              )}
-            </div>
+  <div className="container mx-auto px-6 py-3">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center py-1">
+        <img 
+          src={logo}
+          alt="CertiChain Logo" 
+          className="h-12 w-auto max-w-none" 
+          style={{ 
+            minWidth: '200px',
+            objectFit: 'contain'
+          }}
+        />
+      </div>
+       
+      <div className="flex items-center space-x-4">
+        {/* Botón de modo oscuro/claro */}
+        <button 
+          onClick={alternarModo} 
+          className={`p-2 rounded-full transition-colors ${
+            modoOscuro 
+              ? 'bg-gray-700 text-yellow-300 hover:bg-gray-600' 
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          {modoOscuro ? '☀️' : '🌙'}
+        </button>
+         
+        {/* Estado de conexión */}
+        {account && (
+          <div className="flex items-center space-x-3">
+            <span className={`text-sm font-medium ${
+              modoOscuro ? 'text-gray-300' : 'text-gray-600'
+            }`}>
+              {`${account.substring(0, 6)}...${account.substring(account.length - 4)}`}
+            </span>
+            <button
+              onClick={desconectar}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                modoOscuro 
+                  ? 'bg-red-600 hover:bg-red-700 text-white' 
+                  : 'bg-red-500 hover:bg-red-600 text-white'
+              }`}
+              disabled={loading}
+            >
+              {loading ? 'Desconectando...' : 'Desconectar'}
+            </button>
           </div>
-        </div>
-      </header>
+        )}
+      </div>
+    </div>
+  </div>
+</header>
 
       {/* Contenido principal basado en el rol */}
       <main className="flex flex-1 items-center justify-center min-h-[calc(100vh-80px)] relative z-10">
