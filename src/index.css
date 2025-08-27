@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@keyframes rgbShift {
+  0% { background-position: 0% 50%; text-shadow: 0 0 10px #ff0080, 0 0 20px #ff0080; }
+  25% { text-shadow: 0 0 10px #7928ca, 0 0 20px #7928ca; }
+  50% { background-position: 100% 50%; text-shadow: 0 0 10px #00ffea, 0 0 20px #00ffea; }
+  75% { text-shadow: 0 0 10px #ff0080, 0 0 20px #ff0080; }
+  100% { background-position: 0% 50%; text-shadow: 0 0 10px #7928ca, 0 0 20px #7928ca; }
+}
+
+.animate-rgb-glow {
+  background: linear-gradient(90deg, #ff0080, #7928ca, #00ffea, #ff0080);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rgbShift 6s ease infinite;
+}
+
