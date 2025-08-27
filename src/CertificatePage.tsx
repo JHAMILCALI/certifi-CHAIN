@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { createClient } from '@supabase/supabase-js';
+import AnimatedBackground from './components/AnimatedBackground';
 
 interface Certificado {
   id: string;
@@ -126,9 +127,11 @@ const CertificatePage: React.FC = () => {
   }, [id]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100">
+    <div className="min-h-screen relative">
+      <AnimatedBackground />
+      
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white shadow-sm border-b border-gray-200 relative z-10">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <h1 className="text-3xl font-bold text-gray-900 text-center">
             Verificación de Certificado Digital
@@ -140,7 +143,7 @@ const CertificatePage: React.FC = () => {
       </div>
 
       {/* Contenido principal */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8 relative z-10">
         {loading ? (
           // Estado de carga
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
