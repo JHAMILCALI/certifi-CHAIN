@@ -132,15 +132,36 @@ const CertificatePage: React.FC = () => {
     
     {/* Header */}
     <div className="bg-gray-900 shadow-sm border-b border-gray-800 relative z-10">
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <h1 className="text-3xl font-bold text-white text-center">
-          Verificación de Certificado Digital
-        </h1>
-        <p className="text-gray-400 text-center mt-2">
-          Sistema de certificados blockchain CertiChain
-        </p>
-      </div>
-    </div>
+  <div className="max-w-4xl mx-auto px-4 py-8"> {/* aumenté py-6 -> py-8 */}
+    <h1
+      className="text-4xl md:text-5xl font-extrabold mb-6 relative leading-tight md:leading-snug"
+      style={{
+        background:
+          "linear-gradient(90deg, #ff0080, #7928ca, #00ffea, #ff0080)",
+        backgroundSize: "400% 400%",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        animation: "rgbTextGlow 3s linear infinite",
+      }}
+    >
+      Verificación de Certificado Digital
+      <style>
+        {`
+          @keyframes rgbTextGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+        `}
+      </style>
+    </h1>
+
+    <p className="text-gray-400 text-center mt-2">
+      Sistema de certificados blockchain CertiChain
+    </p>
+  </div>
+</div>
+
 
     {/* Contenido principal */}
     <div className="max-w-4xl mx-auto px-4 py-8 relative z-10">
