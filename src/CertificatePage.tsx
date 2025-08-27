@@ -127,283 +127,283 @@ const CertificatePage: React.FC = () => {
   }, [id]);
 
   return (
-    <div className="min-h-screen relative">
-      <AnimatedBackground />
-      
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 relative z-10">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-900 text-center">
-            Verificación de Certificado Digital
-          </h1>
-          <p className="text-gray-600 text-center mt-2">
-            Sistema de certificados blockchain CertiChain
+  <div className="min-h-screen relative bg-gray-950 text-gray-100">
+    <AnimatedBackground />
+    
+    {/* Header */}
+    <div className="bg-gray-900 shadow-sm border-b border-gray-800 relative z-10">
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        <h1 className="text-3xl font-bold text-white text-center">
+          Verificación de Certificado Digital
+        </h1>
+        <p className="text-gray-400 text-center mt-2">
+          Sistema de certificados blockchain CertiChain
+        </p>
+      </div>
+    </div>
+
+    {/* Contenido principal */}
+    <div className="max-w-4xl mx-auto px-4 py-8 relative z-10">
+      {loading ? (
+        // Estado de carga
+        <div className="bg-gray-900 rounded-2xl shadow-lg p-12 text-center border border-gray-800">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <h2 className="text-2xl font-semibold text-white mb-2">
+            Verificando certificado...
+          </h2>
+          <p className="text-gray-400">
+            Consultando información en la base de datos
           </p>
         </div>
-      </div>
-
-      {/* Contenido principal */}
-      <div className="max-w-4xl mx-auto px-4 py-8 relative z-10">
-        {loading ? (
-          // Estado de carga
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-              Verificando certificado...
-            </h2>
-            <p className="text-gray-600">
-              Consultando información en la base de datos
-            </p>
+      ) : error ? (
+        // Estado de error
+        <div className="bg-gray-900 rounded-2xl shadow-lg p-12 text-center border border-gray-800">
+          <div className="text-6xl mb-6">🚫</div>
+          <h2 className="text-3xl font-bold text-red-500 mb-4">
+            {error}
+          </h2>
+          <p className="text-gray-400 mb-8">
+            No se pudo verificar la autenticidad de este certificado.
+          </p>
+          <div className="bg-red-950 border border-red-700 rounded-xl p-6">
+            <h3 className="font-semibold text-red-300 mb-2">
+              ID consultado:
+            </h3>
+            <code className="bg-red-900 px-3 py-2 rounded font-mono text-sm text-red-200">
+              {id}
+            </code>
           </div>
-        ) : error ? (
-          // Estado de error
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <div className="text-6xl mb-6">🚫</div>
-            <h2 className="text-3xl font-bold text-red-600 mb-4">
-              {error}
-            </h2>
-            <p className="text-gray-600 mb-8">
-              No se pudo verificar la autenticidad de este certificado.
-            </p>
-            <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-              <h3 className="font-semibold text-red-800 mb-2">
-                ID consultado:
-              </h3>
-              <code className="bg-red-100 px-3 py-2 rounded font-mono text-sm text-red-700">
-                {id}
-              </code>
+          <button
+            onClick={obtenerCertificado}
+            className="mt-6 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
+          >
+            Intentar nuevamente
+          </button>
+        </div>
+      ) : certificado ? (
+        // Certificado encontrado
+        <div className="space-y-8">
+          {/* Status Badge */}
+          <div className="text-center">
+            <div className={`inline-flex items-center px-6 py-3 rounded-full border ${obtenerEstadoInfo(certificado.estado).color} font-semibold text-lg`}>
+              <span className="text-2xl mr-2">{obtenerEstadoInfo(certificado.estado).icono}</span>
+              {obtenerEstadoInfo(certificado.estado).texto}
             </div>
-            <button
-              onClick={obtenerCertificado}
-              className="mt-6 px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors font-medium"
-            >
-              Intentar nuevamente
-            </button>
+            <p className="text-gray-400 mt-2">
+              {obtenerEstadoInfo(certificado.estado).descripcion}
+            </p>
           </div>
-        ) : certificado ? (
-          // Certificado encontrado
-          <div className="space-y-8">
-            {/* Status Badge */}
-            <div className="text-center">
-              <div className={`inline-flex items-center px-6 py-3 rounded-full border ${obtenerEstadoInfo(certificado.estado).color} font-semibold text-lg`}>
-                <span className="text-2xl mr-2">{obtenerEstadoInfo(certificado.estado).icono}</span>
-                {obtenerEstadoInfo(certificado.estado).texto}
-              </div>
-              <p className="text-gray-600 mt-2">
-                {obtenerEstadoInfo(certificado.estado).descripcion}
+
+          {/* Información principal del certificado */}
+          <div className="bg-gray-900 rounded-2xl shadow-lg overflow-hidden border border-gray-800">
+            <div className="bg-gradient-to-r from-blue-700 to-indigo-700 p-8 text-white text-center">
+              <div className="text-5xl mb-4">🎓</div>
+              <h2 className="text-4xl font-bold mb-2">
+                {certificado.nombre_estudiante}
+              </h2>
+              <p className="text-blue-200 text-xl">
+                {certificado.institucion}
               </p>
             </div>
 
-            {/* Información principal del certificado */}
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white text-center">
-                <div className="text-5xl mb-4">🎓</div>
-                <h2 className="text-4xl font-bold mb-2">
-                  {certificado.nombre_estudiante}
-                </h2>
-                <p className="text-blue-100 text-xl">
-                  {certificado.institucion}
-                </p>
-              </div>
-
-              <div className="p-8">
-                <div className="grid md:grid-cols-2 gap-8">
-                  {/* Información básica */}
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <span className="text-2xl mr-2">📋</span>
-                        Información del Certificado
-                      </h3>
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-start p-4 bg-gray-50 rounded-xl">
-                          <div>
-                            <p className="text-sm font-medium text-gray-500">Estudiante</p>
-                            <p className="text-lg font-semibold text-gray-900">
-                              {certificado.nombre_estudiante}
-                            </p>
-                          </div>
+            <div className="p-8">
+              <div className="grid md:grid-cols-2 gap-8">
+                {/* Información básica */}
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                      <span className="text-2xl mr-2">📋</span>
+                      Información del Certificado
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-start p-4 bg-gray-800 rounded-xl">
+                        <div>
+                          <p className="text-sm font-medium text-gray-400">Estudiante</p>
+                          <p className="text-lg font-semibold text-white">
+                            {certificado.nombre_estudiante}
+                          </p>
                         </div>
-                        
-                        <div className="flex justify-between items-start p-4 bg-gray-50 rounded-xl">
-                          <div>
-                            <p className="text-sm font-medium text-gray-500">Institución</p>
-                            <p className="text-lg font-semibold text-gray-900">
-                              {certificado.institucion}
-                            </p>
-                          </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-start p-4 bg-gray-800 rounded-xl">
+                        <div>
+                          <p className="text-sm font-medium text-gray-400">Institución</p>
+                          <p className="text-lg font-semibold text-white">
+                            {certificado.institucion}
+                          </p>
                         </div>
+                      </div>
 
-                        <div className="flex justify-between items-start p-4 bg-gray-50 rounded-xl">
-                          <div>
-                            <p className="text-sm font-medium text-gray-500">Fecha de emisión</p>
-                            <p className="text-lg font-semibold text-gray-900">
-                              {formatearFecha(certificado.fecha_emision)}
-                            </p>
-                          </div>
+                      <div className="flex justify-between items-start p-4 bg-gray-800 rounded-xl">
+                        <div>
+                          <p className="text-sm font-medium text-gray-400">Fecha de emisión</p>
+                          <p className="text-lg font-semibold text-white">
+                            {formatearFecha(certificado.fecha_emision)}
+                          </p>
                         </div>
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Información técnica */}
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <span className="text-2xl mr-2">🔧</span>
-                        Información Técnica
-                      </h3>
-                      <div className="space-y-4">
-                        <div className="p-4 bg-gray-50 rounded-xl">
-                          <p className="text-sm font-medium text-gray-500 mb-2">ID del Certificado</p>
+                {/* Información técnica */}
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                      <span className="text-2xl mr-2">🔧</span>
+                      Información Técnica
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="p-4 bg-gray-800 rounded-xl">
+                        <p className="text-sm font-medium text-gray-400 mb-2">ID del Certificado</p>
+                        <div className="flex items-center justify-between">
+                          <code className="bg-gray-700 px-3 py-1 rounded text-sm font-mono text-gray-200">
+                            {certificado.id}
+                          </code>
+                          <button
+                            onClick={() => copiarTexto(certificado.id, 'ID copiado al portapapeles')}
+                            className="text-blue-400 hover:text-blue-600 text-sm font-medium"
+                          >
+                            Copiar
+                          </button>
+                        </div>
+                      </div>
+
+                      {certificado.wallet_destinatario && (
+                        <div className="p-4 bg-gray-800 rounded-xl">
+                          <p className="text-sm font-medium text-gray-400 mb-2">Wallet del Estudiante</p>
                           <div className="flex items-center justify-between">
-                            <code className="bg-gray-200 px-3 py-1 rounded text-sm font-mono">
-                              {certificado.id}
+                            <code className="bg-gray-700 px-3 py-1 rounded text-sm font-mono truncate mr-2 text-gray-200">
+                              {certificado.wallet_destinatario}
                             </code>
                             <button
-                              onClick={() => copiarTexto(certificado.id, 'ID copiado al portapapeles')}
-                              className="text-blue-500 hover:text-blue-700 text-sm font-medium"
+                              onClick={() => copiarTexto(certificado.wallet_destinatario, 'Wallet copiada al portapapeles')}
+                              className="text-blue-400 hover:text-blue-600 text-sm font-medium whitespace-nowrap"
                             >
                               Copiar
                             </button>
                           </div>
                         </div>
+                      )}
 
-                        {certificado.wallet_destinatario && (
-                          <div className="p-4 bg-gray-50 rounded-xl">
-                            <p className="text-sm font-medium text-gray-500 mb-2">Wallet del Estudiante</p>
-                            <div className="flex items-center justify-between">
-                              <code className="bg-gray-200 px-3 py-1 rounded text-sm font-mono truncate mr-2">
-                                {certificado.wallet_destinatario}
-                              </code>
-                              <button
-                                onClick={() => copiarTexto(certificado.wallet_destinatario, 'Wallet copiada al portapapeles')}
-                                className="text-blue-500 hover:text-blue-700 text-sm font-medium whitespace-nowrap"
-                              >
-                                Copiar
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        {certificado.creado_por && (
-                          <div className="p-4 bg-gray-50 rounded-xl">
-                            <p className="text-sm font-medium text-gray-500 mb-2">Emisor</p>
-                            <code className="bg-gray-200 px-3 py-1 rounded text-sm font-mono truncate">
-                              {certificado.creado_por}
-                            </code>
-                          </div>
-                        )}
-                      </div>
+                      {certificado.creado_por && (
+                        <div className="p-4 bg-gray-800 rounded-xl">
+                          <p className="text-sm font-medium text-gray-400 mb-2">Emisor</p>
+                          <code className="bg-gray-700 px-3 py-1 rounded text-sm font-mono truncate text-gray-200">
+                            {certificado.creado_por}
+                          </code>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Imagen del certificado */}
-            {certificado.ipfs_certificado && (
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center flex items-center justify-center">
-                  <span className="text-3xl mr-3">🖼️</span>
-                  Certificado Digital
-                </h3>
-                <div className="flex justify-center">
-                  <img
-                    src={certificado.ipfs_certificado}
-                    alt={`Certificado de ${certificado.nombre_estudiante}`}
-                    className="max-w-full h-auto rounded-xl shadow-md border border-gray-200"
-                    style={{ maxHeight: '600px' }}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Acciones y enlaces */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center flex items-center justify-center">
-                <span className="text-3xl mr-3">🔗</span>
-                Enlaces y Verificación
+          {/* Imagen del certificado */}
+          {certificado.ipfs_certificado && (
+            <div className="bg-gray-900 rounded-2xl shadow-lg p-8 border border-gray-800">
+              <h3 className="text-2xl font-bold text-white mb-6 text-center flex items-center justify-center">
+                <span className="text-3xl mr-3">🖼️</span>
+                Certificado Digital
               </h3>
-              
-              <div className="grid md:grid-cols-3 gap-4">
-                {certificado.ipfs_certificado && (
-                  <button
-                    onClick={() => abrirEnlace(certificado.ipfs_certificado!)}
-                    className="w-full p-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl transition-colors text-center"
-                  >
-                    <div className="text-2xl mb-2">📜</div>
-                    <div className="font-semibold text-blue-800">Ver Certificado</div>
-                    <div className="text-sm text-blue-600">Abrir imagen IPFS</div>
-                  </button>
-                )}
-
-                {certificado.ipfs_metadata && (
-                  <button
-                    onClick={() => abrirEnlace(certificado.ipfs_metadata!)}
-                    className="w-full p-4 bg-green-50 hover:bg-green-100 border border-green-200 rounded-xl transition-colors text-center"
-                  >
-                    <div className="text-2xl mb-2">📋</div>
-                    <div className="font-semibold text-green-800">Metadata JSON</div>
-                    <div className="text-sm text-green-600">Ver información técnica</div>
-                  </button>
-                )}
-
-                {certificado.tx_hash && (
-                  <button
-                    onClick={() => abrirEnlace(`https://sepolia.etherscan.io/tx/${certificado.tx_hash}`)}
-                    className="w-full p-4 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl transition-colors text-center"
-                  >
-                    <div className="text-2xl mb-2">⛓️</div>
-                    <div className="font-semibold text-purple-800">Ver en Blockchain</div>
-                    <div className="text-sm text-purple-600">Etherscan Sepolia</div>
-                  </button>
-                )}
-              </div>
-
-              {/* Información de verificación */}
-              <div className="mt-8 p-6 bg-green-50 border border-green-200 rounded-xl">
-                <div className="flex items-center justify-center mb-4">
-                  <div className="text-4xl mr-3">✅</div>
-                  <h4 className="text-xl font-bold text-green-800">
-                    Certificado Verificado
-                  </h4>
-                </div>
-                <p className="text-green-700 text-center mb-4">
-                  Este certificado ha sido verificado exitosamente y está registrado en nuestro sistema.
-                </p>
-                <div className="text-center text-sm text-green-600">
-                  <p>Última actualización: {formatearFecha(certificado.updated_at)}</p>
-                  <p className="mt-1">Sistema CertiChain - Certificados Blockchain</p>
-                </div>
+              <div className="flex justify-center">
+                <img
+                  src={certificado.ipfs_certificado}
+                  alt={`Certificado de ${certificado.nombre_estudiante}`}
+                  className="max-w-full h-auto rounded-xl shadow-md border border-gray-700"
+                  style={{ maxHeight: '600px' }}
+                />
               </div>
             </div>
+          )}
 
-            {/* Footer con información adicional */}
-            <div className="text-center p-6 bg-gray-50 rounded-xl">
-              <h4 className="font-semibold text-gray-900 mb-2">
-                ¿Cómo verificar la autenticidad?
-              </h4>
-              <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-600">
-                <div className="p-4 bg-white rounded-lg">
-                  <div className="text-2xl mb-2">🔍</div>
-                  <p><strong>ID único:</strong> Cada certificado tiene un identificador único e irrepetible</p>
-                </div>
-                <div className="p-4 bg-white rounded-lg">
-                  <div className="text-2xl mb-2">🌐</div>
-                  <p><strong>IPFS:</strong> Los archivos están almacenados de forma descentralizada</p>
-                </div>
-                <div className="p-4 bg-white rounded-lg">
+          {/* Acciones y enlaces */}
+          <div className="bg-gray-900 rounded-2xl shadow-lg p-8 border border-gray-800">
+            <h3 className="text-2xl font-bold text-white mb-6 text-center flex items-center justify-center">
+              <span className="text-3xl mr-3">🔗</span>
+              Enlaces y Verificación
+            </h3>
+            
+            <div className="grid md:grid-cols-3 gap-4">
+              {certificado.ipfs_certificado && (
+                <button
+                  onClick={() => abrirEnlace(certificado.ipfs_certificado!)}
+                  className="w-full p-4 bg-blue-950 hover:bg-blue-900 border border-blue-700 rounded-xl transition-colors text-center"
+                >
+                  <div className="text-2xl mb-2">📜</div>
+                  <div className="font-semibold text-blue-300">Ver Certificado</div>
+                  <div className="text-sm text-blue-400">Abrir imagen IPFS</div>
+                </button>
+              )}
+
+              {certificado.ipfs_metadata && (
+                <button
+                  onClick={() => abrirEnlace(certificado.ipfs_metadata!)}
+                  className="w-full p-4 bg-green-950 hover:bg-green-900 border border-green-700 rounded-xl transition-colors text-center"
+                >
+                  <div className="text-2xl mb-2">📋</div>
+                  <div className="font-semibold text-green-300">Metadata JSON</div>
+                  <div className="text-sm text-green-400">Ver información técnica</div>
+                </button>
+              )}
+
+              {certificado.tx_hash && (
+                <button
+                  onClick={() => abrirEnlace(`https://sepolia.etherscan.io/tx/${certificado.tx_hash}`)}
+                  className="w-full p-4 bg-purple-950 hover:bg-purple-900 border border-purple-700 rounded-xl transition-colors text-center"
+                >
                   <div className="text-2xl mb-2">⛓️</div>
-                  <p><strong>Blockchain:</strong> Registro inmutable en red Ethereum (cuando está minteado)</p>
-                </div>
+                  <div className="font-semibold text-purple-300">Ver en Blockchain</div>
+                  <div className="text-sm text-purple-400">Etherscan Sepolia</div>
+                </button>
+              )}
+            </div>
+
+            {/* Información de verificación */}
+            <div className="mt-8 p-6 bg-green-950 border border-green-700 rounded-xl">
+              <div className="flex items-center justify-center mb-4">
+                <div className="text-4xl mr-3">✅</div>
+                <h4 className="text-xl font-bold text-green-300">
+                  Certificado Verificado
+                </h4>
+              </div>
+              <p className="text-green-400 text-center mb-4">
+                Este certificado ha sido verificado exitosamente y está registrado en nuestro sistema.
+              </p>
+              <div className="text-center text-sm text-green-500">
+                <p>Última actualización: {formatearFecha(certificado.updated_at)}</p>
+                <p className="mt-1">Sistema CertiChain - Certificados Blockchain</p>
               </div>
             </div>
           </div>
-        ) : null}
-      </div>
+
+          {/* Footer con información adicional */}
+          <div className="text-center p-6 bg-gray-900 rounded-xl border border-gray-800">
+            <h4 className="font-semibold text-white mb-2">
+              ¿Cómo verificar la autenticidad?
+            </h4>
+            <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-300">
+              <div className="p-4 bg-gray-800 rounded-lg">
+                <div className="text-2xl mb-2">🔍</div>
+                <p><strong>ID único:</strong> Cada certificado tiene un identificador único e irrepetible</p>
+              </div>
+              <div className="p-4 bg-gray-800 rounded-lg">
+                <div className="text-2xl mb-2">🌐</div>
+                <p><strong>IPFS:</strong> Los archivos están almacenados de forma descentralizada</p>
+              </div>
+              <div className="p-4 bg-gray-800 rounded-lg">
+                <div className="text-2xl mb-2">⛓️</div>
+                <p><strong>Blockchain:</strong> Registro inmutable en red Ethereum (cuando está minteado)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
-  );
+  </div>
+);
 };
 
 export default CertificatePage;
