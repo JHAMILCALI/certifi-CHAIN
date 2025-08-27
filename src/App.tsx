@@ -229,6 +229,7 @@ const App = () => {
               Conecta tu billetera para acceder al panel correspondiente según
               tu rol en la plataforma.
             </p>
+            
             <button
               onClick={conectarBilletera}
               disabled={loading}
@@ -243,6 +244,7 @@ const App = () => {
               `}
               style={{ zIndex: 1 }}
             >
+
               <span
                 className="absolute inset-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
                 style={{

@@ -7,7 +7,7 @@ import { getCertiChainTokenContract } from "../contracts/CertiChainToken";
 import { QRCodeSVG } from "qrcode.react";
 import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
-import img1 from "../assets/logo QR.png";
+
 
 interface DirectorPanelProps {
   account: string;
@@ -576,19 +576,45 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
 
                 {/* Botón de acción principal */}
                 <div className="mt-16 flex justify-center">
-                  <button
-                    onClick={handleUpload}
-                    className={`px-12 py-5 text-xl rounded-xl font-bold transition-all duration-200 relative overflow-hidden ${
-                      modoOscuro
-                        ? "bg-blue-600 hover:bg-blue-700"
-                        : "bg-blue-500 hover:bg-blue-600"
-                    }`}
-                  >
-                    <span className="relative z-10 text-white">
-                      Generar y Subir Certificado
-                    </span>
-                  </button>
-                </div>
+  <button
+    onClick={handleUpload}
+    className={`group px-12 py-5 text-xl rounded-xl font-bold transition-all duration-200 relative overflow-hidden ${
+      modoOscuro
+        ? "bg-blue-600 hover:bg-blue-700"
+        : "bg-blue-500 hover:bg-blue-600"
+    }`}
+  >
+    {/* Glow animado detrás */}
+    <span
+      className="absolute inset-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+      style={{
+        background:
+          "linear-gradient(270deg, #ff0080, #7928ca, #00ffea, #ff0080)",
+        backgroundSize: "600% 600%",
+        animation: "rgbGlow 3s linear infinite",
+        filter: "blur(14px)",
+        zIndex: 0,
+      }}
+    />
+    
+    {/* Texto */}
+    <span className="relative z-10 text-white">
+      Generar y Subir Certificado
+    </span>
+
+    {/* Keyframes para la animación */}
+    <style>
+      {`
+        @keyframes rgbGlow {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}
+    </style>
+  </button>
+</div>
+
 
                 {/* Sección de Metadata JSON */}
                 {showJsonForm && (
