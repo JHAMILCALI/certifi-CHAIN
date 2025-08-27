@@ -133,7 +133,7 @@ const CertificatePage: React.FC = () => {
     {/* Header */}
     <div className="bg-gray-900 shadow-sm border-b border-gray-800 relative z-10">
   <div className="max-w-4xl mx-auto px-4 py-8"> {/* aumenté py-6 -> py-8 */}
-    <h1
+    <h1 
       className="text-4xl md:text-5xl font-extrabold mb-6 relative leading-tight md:leading-snug"
       style={{
         background:
@@ -142,6 +142,7 @@ const CertificatePage: React.FC = () => {
         WebkitBackgroundClip: "text",
         WebkitTextFillColor: "transparent",
         animation: "rgbTextGlow 3s linear infinite",
+        textAlign: "center"
       }}
     >
       Verificación de Certificado Digital
@@ -194,12 +195,40 @@ const CertificatePage: React.FC = () => {
               {id}
             </code>
           </div>
+
           <button
-            onClick={obtenerCertificado}
-            className="mt-6 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
-          >
-            Intentar nuevamente
-          </button>
+  onClick={obtenerCertificado}
+  className="group relative mt-6 px-6 py-3 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors overflow-hidden"
+>
+  {/* Glow animado detrás */}
+  <span
+    className="absolute inset-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+    style={{
+      background:
+        "linear-gradient(270deg, #ff0080, #7928ca, #00ffea, #ff0080)",
+      backgroundSize: "600% 600%",
+      animation: "rgbGlow 3s linear infinite",
+      filter: "blur(14px)",
+      zIndex: 0,
+    }}
+  />
+
+  {/* Texto visible por encima */}
+  <span className="relative z-10">Intentar Nuevamente</span>
+
+  {/* Animación keyframes */}
+  <style>
+    {`
+      @keyframes rgbGlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+    `}
+  </style>
+</button>
+
+
         </div>
       ) : certificado ? (
         // Certificado encontrado
