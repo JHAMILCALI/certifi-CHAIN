@@ -537,7 +537,7 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
                             1.5,
                             3 - nombre.length * 0.03
                           )}vw`,
-                          maxWidth: "85%",
+                          maxWidth: "95%",
                           top: "36%",
                         }}
                       >
