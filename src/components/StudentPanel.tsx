@@ -35,6 +35,7 @@ const StudentPanel = ({ account, modoOscuro }: StudentPanelProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mostrarImportar, setMostrarImportar] = useState(false);
+  const [mensajeCompartir, setMensajeCompartir] = useState<string | null>(null);
 
   // Función para obtener los certificados del estudiante
   const obtenerCertificadosEstudiante = async () => {
@@ -114,6 +115,14 @@ const StudentPanel = ({ account, modoOscuro }: StudentPanelProps) => {
     alert("Wallet copiada al portapapeles");
   };
 
+  // Función para compartir certificado
+  const compartirCertificado = (certificado: Certificado) => {
+    const enlace = `https://certifi-chain.vercel.app/${certificado.id}`;
+    navigator.clipboard.writeText(enlace);
+    setMensajeCompartir("✅ Enlace copiado al portapapeles");
+    setTimeout(() => setMensajeCompartir(null), 3000);
+  };
+
   // useEffect para cargar certificados cuando cambie la wallet
   useEffect(() => {
     if (account) {
@@ -126,6 +135,13 @@ const StudentPanel = ({ account, modoOscuro }: StudentPanelProps) => {
       className={`min-h-screen ${modoOscuro ? "bg-gray-900" : "bg-gray-50"}`}
     >
       <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Mensaje de compartir */}
+        {mensajeCompartir && (
+          <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg">
+            {mensajeCompartir}
+          </div>
+        )}
+
         <div
           className={`p-6 rounded-lg ${
             modoOscuro ? "bg-gray-800" : "bg-white shadow"
@@ -355,6 +371,18 @@ const StudentPanel = ({ account, modoOscuro }: StudentPanelProps) => {
                         ⛓️ Ver en Blockchain
                       </button>
                     )}
+
+                    {/* Botón para compartir certificado */}
+                    <button
+                      onClick={() => compartirCertificado(certificado)}
+                      className={`w-full px-3 py-2 rounded text-sm font-medium transition-colors ${
+                        modoOscuro
+                          ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+                          : "bg-indigo-500 hover:bg-indigo-600 text-white"
+                      }`}
+                    >
+                      📤 Compartir Certificado
+                    </button>
                   </div>
                 </div>
               ))}
@@ -449,6 +477,10 @@ const StudentPanel = ({ account, modoOscuro }: StudentPanelProps) => {
                   🆔 <strong>ID del certificado:</strong> Identificador único
                   para verificación
                 </li>
+                <li>
+                  🌐 <strong>Enlace de verificación:</strong> Enlace único para
+                  compartir y verificar tu certificado en nuestra plataforma
+                </li>
               </ul>
             </div>
 
@@ -515,38 +547,40 @@ const StudentPanel = ({ account, modoOscuro }: StudentPanelProps) => {
                 >
                   <li>
                     En la parte de ariba nos saldra los certificados que hemos
-                    recibido.
-                    
-                    Le daremos en <strong>Ver en Blochain</strong> para que nos lleve a ver donde esta nuetro NFT.
+                    recibido. Le daremos en <strong>Ver en Blochain</strong>{" "}
+                    para que nos lleve a ver donde esta nuetro NFT.
                     <div className="mt-4">
-                  <img
-                    src={img1}
-                    alt="Ejemplo importar NFT"
-                    className="rounded-lg shadow-md"
-                  />
-                </div>
+                      <img
+                        src={img1}
+                        alt="Ejemplo importar NFT"
+                        className="rounded-lg shadow-md"
+                      />
+                    </div>
                   </li>
                   <li>
-                    Ve al apartdo <strong>copiar direcion</strong> y verificamos el numero de ID{" "}
-                    <strong>"En este caso es el 7"</strong>.
+                    Ve al apartdo <strong>copiar direcion</strong> y verificamos
+                    el numero de ID <strong>"En este caso es el 7"</strong>.
                     <div className="mt-4">
-                  <img
-                    src={img2}
-                    alt="Ejemplo importar NFT"
-                    className="rounded-lg shadow-md"
-                  />
-                </div>
+                      <img
+                        src={img2}
+                        alt="Ejemplo importar NFT"
+                        className="rounded-lg shadow-md"
+                      />
+                    </div>
                   </li>
                   <li>
-                    Abre tu billetera MetaMask y sigue los siguintes pasos{" "} cuando estemos en agregar nft selecionamos la red de <strong>sepolia</strong>
-                    , en direcion pegamos lo que copiamos la direcion de la blockchain y en ID 7 y le damos a <strong>Importar</strong>.
+                    Abre tu billetera MetaMask y sigue los siguintes pasos{" "}
+                    cuando estemos en agregar nft selecionamos la red de{" "}
+                    <strong>sepolia</strong>, en direcion pegamos lo que
+                    copiamos la direcion de la blockchain y en ID 7 y le damos a{" "}
+                    <strong>Importar</strong>.
                     <div className="mt-4">
-                  <img
-                    src={img3}
-                    alt="Ejemplo importar NFT"
-                    className="rounded-lg shadow-md"
-                  />
-                </div>
+                      <img
+                        src={img3}
+                        alt="Ejemplo importar NFT"
+                        className="rounded-lg shadow-md"
+                      />
+                    </div>
                   </li>
                 </ol>
               </div>
