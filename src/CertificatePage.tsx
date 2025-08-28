@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { createClient } from '@supabase/supabase-js';
 import AnimatedBackground from './components/AnimatedBackground';
+import img1 from './assets/logo.svg';
 
 interface Certificado {
   id: string;
@@ -157,9 +158,17 @@ const CertificatePage: React.FC = () => {
       </style>
     </h1>
 
-    <p className="text-gray-400 text-center mt-2">
-      Sistema de certificados blockchain CertiChain
-    </p>
+    <div className="flex items-center py-4 justify-center">
+  <img
+    src={img1}
+    alt="CertiChain Logo"
+    className="h-15 w-auto max-w-none md:h-20 lg:h-25"  // Aumenté el tamaño
+    style={{
+      minWidth: "300px",  // Aumenté el ancho mínimo
+      objectFit: "contain",
+    }}
+  />
+</div>
   </div>
 </div>
 
