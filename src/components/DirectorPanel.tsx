@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import html2canvas from "html2canvas";
 import { PinataSDK } from "pinata";
-import certificadoImg from "../assets/certificado.jpg";
+import certificadoImg from "../assets/certificado2.jpg";
 import { ethers } from "ethers";
 import { getCertiChainTokenContract } from "../contracts/CertiChainToken";
 import { QRCodeSVG } from "qrcode.react";
@@ -537,8 +537,8 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
                             1.5,
                             3 - nombre.length * 0.03
                           )}vw`,
-                          maxWidth: "85%",
-                          top: "36%",
+                          maxWidth: "95%",
+                          top: "33%",
                         }}
                       >
                         {nombre}
@@ -563,8 +563,8 @@ const DirectorPanel = ({ modoOscuro, signer, account }: DirectorPanelProps) => {
                         className="absolute text-black"
                         style={{
                           bottom: "22%",
-                          left: "24%",
-                          top: "52%",
+                          left: "15%",
+                          top: "78%",
                           fontSize: "1.3vw",
                         }}
                       >
